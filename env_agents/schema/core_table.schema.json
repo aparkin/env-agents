@@ -1,0 +1,132 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "env-agents Core Observation Table",
+  "type": "object",
+  "properties": {
+    "observation_id": {
+      "type": "string"
+    },
+    "dataset": {
+      "type": "string"
+    },
+    "source_url": {
+      "type": "string"
+    },
+    "source_version": {
+      "type": "string"
+    },
+    "license": {
+      "type": "string"
+    },
+    "retrieval_timestamp": {
+      "type": "string"
+    },
+    "geometry_type": {
+      "type": "string",
+      "enum": [
+        "point",
+        "bbox",
+        "polygon"
+      ]
+    },
+    "latitude": {
+      "type": "number"
+    },
+    "longitude": {
+      "type": "number"
+    },
+    "geom_wkt": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "spatial_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "site_name": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "admin": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "elevation_m": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "time": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "temporal_coverage": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "variable": {
+      "type": "string"
+    },
+    "value": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "unit": {
+      "type": "string"
+    },
+    "depth_top_cm": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "depth_bottom_cm": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "qc_flag": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "attributes": {
+      "type": "object"
+    },
+    "provenance": {
+      "type": "object"
+    }
+  },
+  "required": [
+    "observation_id",
+    "dataset",
+    "source_url",
+    "source_version",
+    "license",
+    "retrieval_timestamp",
+    "geometry_type",
+    "latitude",
+    "longitude",
+    "variable",
+    "unit",
+    "attributes",
+    "provenance"
+  ]
+}

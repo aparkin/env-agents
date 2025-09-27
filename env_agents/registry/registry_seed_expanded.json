@@ -1,0 +1,309 @@
+{
+  "variables": {
+    "_comment": "Canonical environmental variables organized by domain",
+    
+    "air:pm25_mass_concentration": {
+      "label": "PM2.5 mass concentration in air",
+      "description": "Mass concentration of particles with aerodynamic diameter less than 2.5 micrometers",
+      "observed_property_uri": "http://vocab.nerc.ac.uk/standard_name/mass_concentration_of_pm2p5_ambient_aerosol_particles_in_air/",
+      "preferred_unit": "µg/m³",
+      "unit_uri": "http://qudt.org/vocab/unit/MicroGM-PER-M3",
+      "domain": "air",
+      "alt_units": ["mg/m³", "ng/m³"],
+      "unit_conversions": {"mg/m³": 1000.0, "ng/m³": 0.001},
+      "ontology": ["CF", "QUDT", "WHO"],
+      "health_relevance": "high",
+      "datasets": {
+        "EPA_AQS_v3": {"native": "88101"},
+        "OpenAQ_v3": {"native": "pm25"}
+      }
+    },
+
+    "air:ozone_concentration": {
+      "label": "Ozone mass concentration in air",
+      "description": "Mass concentration of ozone in ambient air",
+      "observed_property_uri": "http://vocab.nerc.ac.uk/standard_name/mass_concentration_of_ozone_in_air/",
+      "preferred_unit": "µg/m³",
+      "unit_uri": "http://qudt.org/vocab/unit/MicroGM-PER-M3",
+      "domain": "air",
+      "alt_units": ["ppb", "ppm"],
+      "unit_conversions": {"ppb": 2.0, "ppm": 0.002},
+      "ontology": ["CF", "QUDT", "WHO"],
+      "health_relevance": "high",
+      "datasets": {
+        "EPA_AQS_v3": {"native": "44201"},
+        "OpenAQ_v3": {"native": "o3"}
+      }
+    },
+
+    "water:discharge_cfs": {
+      "label": "Stream discharge",
+      "description": "Volumetric flow rate of water in stream channel",
+      "observed_property_uri": "http://vocab.nerc.ac.uk/standard_name/water_volume_transport_in_river_channel/",
+      "preferred_unit": "ft³/s",
+      "unit_uri": "http://qudt.org/vocab/unit/FT3-PER-SEC",
+      "domain": "water",
+      "alt_units": ["m³/s", "L/s"],
+      "unit_conversions": {"m³/s": 35.3146667, "L/s": 28316.85},
+      "ontology": ["CF", "QUDT", "USGS"],
+      "hydrologic_relevance": "critical",
+      "datasets": {
+        "USGS_NWIS": {"native": "00060"}
+      }
+    },
+
+    "water:temperature_c": {
+      "label": "Water temperature",
+      "description": "Temperature of water body",
+      "observed_property_uri": "http://vocab.nerc.ac.uk/standard_name/sea_water_temperature/",
+      "preferred_unit": "°C",
+      "unit_uri": "http://qudt.org/vocab/unit/DEG_C",
+      "domain": "water",
+      "alt_units": ["°F", "K"],
+      "unit_conversions": {"°F": "offset_formula", "K": 273.15},
+      "ontology": ["CF", "QUDT"],
+      "datasets": {
+        "USGS_NWIS": {"native": "00010"}
+      }
+    },
+
+    "atm:air_temperature_2m": {
+      "label": "2-meter air temperature",
+      "description": "Air temperature at 2 meters above surface",
+      "observed_property_uri": "http://vocab.nerc.ac.uk/standard_name/air_temperature/",
+      "preferred_unit": "°C",
+      "unit_uri": "http://qudt.org/vocab/unit/DEG_C",
+      "domain": "atmosphere",
+      "alt_units": ["°F", "K"],
+      "unit_conversions": {"°F": "offset_formula", "K": 273.15},
+      "ontology": ["CF", "QUDT", "WMO"],
+      "measurement_height": "2m",
+      "datasets": {
+        "NASA_POWER": {"native": "T2M"},
+        "NOAA": {"native": "TMAX"}
+      }
+    },
+
+    "atm:precipitation_corrected": {
+      "label": "Bias-corrected precipitation",
+      "description": "Daily total precipitation with bias correction applied",
+      "observed_property_uri": "http://vocab.nerc.ac.uk/standard_name/precipitation_amount/", 
+      "preferred_unit": "mm",
+      "unit_uri": "http://qudt.org/vocab/unit/MilliM",
+      "domain": "atmosphere",
+      "alt_units": ["in", "cm"],
+      "unit_conversions": {"in": 25.4, "cm": 0.1},
+      "ontology": ["CF", "QUDT", "WMO"],
+      "temporal_aggregation": "daily",
+      "datasets": {
+        "NASA_POWER": {"native": "PRECTOTCORR"}
+      }
+    },
+
+    "atm:solar_irradiance_surface_shortwave": {
+      "label": "Surface solar irradiance (shortwave)",
+      "description": "Downward shortwave solar irradiance at Earth's surface",
+      "observed_property_uri": "http://vocab.nerc.ac.uk/standard_name/surface_downwelling_shortwave_flux_in_air/",
+      "preferred_unit": "MJ/m²/d",
+      "unit_uri": "http://qudt.org/vocab/unit/MegaJ-PER-M2-DAY",
+      "domain": "atmosphere",
+      "alt_units": ["W/m²", "kWh/m²/d", "ly/d"],
+      "unit_conversions": {"W/m²": 86400, "kWh/m²/d": 3.6, "ly/d": 23.9},
+      "ontology": ["CF", "QUDT", "WMO"],
+      "radiation_type": "shortwave",
+      "datasets": {
+        "NASA_POWER": {"native": "ALLSKY_SFC_SW_DWN"}
+      }
+    },
+
+    "land:ndvi": {
+      "label": "Normalized Difference Vegetation Index",
+      "description": "Measure of vegetation greenness and density from satellite imagery",
+      "observed_property_uri": "http://vocab.nerc.ac.uk/standard_name/normalized_difference_vegetation_index/",
+      "preferred_unit": "dimensionless",
+      "unit_uri": "http://qudt.org/vocab/unit/UNITLESS",
+      "domain": "land",
+      "value_range": [-1.0, 1.0],
+      "ontology": ["MODIS", "Landsat"],
+      "spatial_resolution": "variable",
+      "datasets": {
+        "AppEEARS": {"native": "NDVI"}
+      }
+    },
+
+    "land:land_cover_class": {
+      "label": "Land cover classification",
+      "description": "Categorical classification of land surface cover type",
+      "observed_property_uri": "http://vocab.nerc.ac.uk/standard_name/land_cover/",
+      "preferred_unit": "category",
+      "unit_uri": "http://qudt.org/vocab/unit/UNITLESS",
+      "domain": "land",
+      "data_type": "categorical",
+      "ontology": ["USDA", "NLCD"],
+      "datasets": {
+        "CropScape": {"native": "crop_type"}
+      }
+    },
+
+    "fire:fire_radiative_power": {
+      "label": "Fire Radiative Power",
+      "description": "Rate of radiative energy release from active fire",
+      "observed_property_uri": "http://vocab.nerc.ac.uk/standard_name/fire_radiative_power/",
+      "preferred_unit": "MW",
+      "unit_uri": "http://qudt.org/vocab/unit/MegaW",
+      "domain": "fire",
+      "alt_units": ["W", "kW"],
+      "unit_conversions": {"W": 1000000, "kW": 1000},
+      "ontology": ["MODIS", "VIIRS"],
+      "datasets": {
+        "FIRMS": {"native": "frp"}
+      }
+    },
+
+    "ecology:species_occurrence": {
+      "label": "Species occurrence record",
+      "description": "Documented occurrence of biological species at location and time", 
+      "observed_property_uri": "http://rs.tdwg.org/dwc/terms/Occurrence",
+      "preferred_unit": "boolean",
+      "unit_uri": "http://qudt.org/vocab/unit/UNITLESS",
+      "domain": "ecology",
+      "data_type": "boolean",
+      "ontology": ["DarwinCore", "GBIF"],
+      "datasets": {
+        "GBIF": {"native": "occurrence"}
+      }
+    },
+
+    "infrastructure:road_density": {
+      "label": "Road network density",
+      "description": "Linear density of roads per unit area",
+      "observed_property_uri": "http://vocab.nerc.ac.uk/standard_name/road_density/",
+      "preferred_unit": "km/km²",
+      "unit_uri": "http://qudt.org/vocab/unit/KiloM-PER-KiloM2",
+      "domain": "infrastructure",
+      "alt_units": ["mi/mi²", "m/m²"],
+      "ontology": ["OSM"],
+      "datasets": {
+        "OSM_Overpass": {"native": "road_length"}
+      }
+    }
+  },
+
+  "domains": {
+    "air": {
+      "label": "Atmospheric air quality",
+      "description": "Chemical composition and physical properties of ambient air",
+      "related_standards": ["WHO Air Quality Guidelines", "EPA NAAQS", "CF Standard Names"],
+      "typical_units": ["µg/m³", "ppb", "ppm", "°C", "%", "m/s"],
+      "measurement_context": "ambient_monitoring"
+    },
+    
+    "water": {
+      "label": "Water resources and quality",
+      "description": "Physical, chemical, and biological properties of water bodies",
+      "related_standards": ["USGS Water Data Standards", "WQX Data Exchange", "CF Standard Names"],
+      "typical_units": ["ft³/s", "mg/L", "°C", "µS/cm", "NTU"],
+      "measurement_context": "surface_water_monitoring"
+    },
+    
+    "atmosphere": {
+      "label": "Meteorological and climate variables",
+      "description": "Weather and climate parameters in the atmosphere",
+      "related_standards": ["WMO Standards", "CF Standard Names", "GRIB"],
+      "typical_units": ["°C", "mm", "m/s", "hPa", "%", "MJ/m²/d"],
+      "measurement_context": "meteorological_observation"
+    },
+    
+    "land": {
+      "label": "Land surface characteristics",
+      "description": "Properties and characteristics of terrestrial land surface",
+      "related_standards": ["MODIS Land Products", "Landsat", "USDA Land Cover"],
+      "typical_units": ["dimensionless", "category", "°C", "kg/m²"],
+      "measurement_context": "remote_sensing"
+    },
+    
+    "fire": {
+      "label": "Fire detection and characteristics",
+      "description": "Active fire detection and fire-related measurements",
+      "related_standards": ["MODIS Fire Products", "VIIRS Active Fire"],
+      "typical_units": ["MW", "°C", "dimensionless"],
+      "measurement_context": "satellite_fire_detection"
+    },
+    
+    "ecology": {
+      "label": "Ecological and biodiversity observations",
+      "description": "Species occurrences and ecological measurements",
+      "related_standards": ["Darwin Core", "GBIF Data Standards"],
+      "typical_units": ["boolean", "count", "category"],
+      "measurement_context": "biodiversity_monitoring"
+    },
+    
+    "infrastructure": {
+      "label": "Built environment and infrastructure",
+      "description": "Human-built infrastructure and development patterns",
+      "related_standards": ["OpenStreetMap Standards"],
+      "typical_units": ["km/km²", "count", "boolean"],
+      "measurement_context": "geospatial_analysis"
+    }
+  },
+
+  "units": {
+    "µg/m³": {
+      "label": "Micrograms per cubic meter",
+      "uri": "http://qudt.org/vocab/unit/MicroGM-PER-M3",
+      "ucum": "ug/m3",
+      "domain": "air",
+      "type": "concentration"
+    },
+    "ft³/s": {
+      "label": "Cubic feet per second", 
+      "uri": "http://qudt.org/vocab/unit/FT3-PER-SEC",
+      "ucum": "[ft_i]3/s",
+      "domain": "water",
+      "type": "flow"
+    },
+    "°C": {
+      "label": "Degrees Celsius",
+      "uri": "http://qudt.org/vocab/unit/DEG_C", 
+      "ucum": "Cel",
+      "domain": "universal",
+      "type": "temperature"
+    },
+    "mm": {
+      "label": "Millimeters",
+      "uri": "http://qudt.org/vocab/unit/MilliM",
+      "ucum": "mm", 
+      "domain": "universal",
+      "type": "length"
+    },
+    "MJ/m²/d": {
+      "label": "Megajoules per square meter per day",
+      "uri": "http://qudt.org/vocab/unit/MegaJ-PER-M2-DAY", 
+      "ucum": "MJ/(m2.d)",
+      "domain": "atmosphere", 
+      "type": "irradiance"
+    }
+  },
+
+  "methods": {
+    "satellite_remote_sensing": {
+      "label": "Satellite remote sensing",
+      "description": "Measurements derived from satellite-based sensors"
+    },
+    "in_situ_monitoring": {
+      "label": "In-situ monitoring",
+      "description": "Direct measurements at monitoring locations"
+    },
+    "model_derived": {
+      "label": "Model-derived",
+      "description": "Values computed from numerical models"
+    }
+  },
+
+  "qc_flags": {
+    "validated": {"label": "Validated", "description": "Data has passed quality validation"},
+    "provisional": {"label": "Provisional", "description": "Data is provisional, subject to revision"},
+    "estimated": {"label": "Estimated", "description": "Data values are estimated"},
+    "missing": {"label": "Missing", "description": "No data available for this observation"}
+  }
+}

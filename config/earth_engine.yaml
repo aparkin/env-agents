@@ -1,0 +1,86 @@
+# Earth Engine Configuration
+# Settings for Google Earth Engine integration
+
+authentication:
+  mode: "service_account"  # or "oauth" 
+  auto_initialize: true
+  
+query_defaults:
+  scale: 1000  # Default resolution in meters
+  max_pixels: 1000
+  max_features: 500
+  timeout: 60
+  
+# Featured asset collections for discovery
+featured_assets:
+  # Satellite imagery
+  - asset_id: "LANDSAT/LC08/C02/T1_L2"
+    title: "Landsat 8 Surface Reflectance"
+    category: "satellite"
+    bands: ["SR_B1", "SR_B2", "SR_B3", "SR_B4", "SR_B5", "SR_B6", "SR_B7"]
+    
+  - asset_id: "COPERNICUS/S2_SR_HARMONIZED" 
+    title: "Sentinel-2 Surface Reflectance"
+    category: "satellite"
+    bands: ["B2", "B3", "B4", "B8"]
+    
+  # MODIS products
+  - asset_id: "MODIS/006/MOD17A2H"
+    title: "MODIS Gross Primary Productivity"
+    category: "vegetation"
+    bands: ["Gpp", "PsnNet", "Psn_QC"]
+    
+  - asset_id: "MODIS/006/MOD13A1"
+    title: "MODIS Vegetation Indices"
+    category: "vegetation" 
+    bands: ["NDVI", "EVI"]
+    
+  # Climate data
+  - asset_id: "ECMWF/ERA5_LAND/DAILY_AGGR"
+    title: "ERA5-Land Daily Aggregates"
+    category: "climate"
+    bands: ["temperature_2m", "total_precipitation"]
+    
+  # Terrain
+  - asset_id: "NASA/NASADEM_HGT/001"
+    title: "NASADEM Elevation"
+    category: "terrain"
+    bands: ["elevation"]
+
+# Asset discovery settings  
+discovery:
+  auto_refresh_catalog: true
+  refresh_interval_days: 7
+  include_deprecated: false
+  max_assets_per_category: 50
+  
+# Categories for asset organization
+asset_categories:
+  satellite:
+    - "LANDSAT"
+    - "COPERNICUS"
+    - "SENTINEL"
+  
+  climate:
+    - "ECMWF"
+    - "NASA/GLDAS"
+    - "NOAA"
+    
+  vegetation:
+    - "MODIS/006/MOD13"
+    - "MODIS/006/MOD17"
+    
+  terrain:
+    - "NASA/NASADEM"
+    - "USGS/SRTMGL1"
+    
+  population:
+    - "WorldPop"
+    - "JRC/GHSL"
+
+# Rate limiting and performance
+performance:
+  concurrent_requests: 3
+  retry_attempts: 2
+  cache_results: true
+  cache_ttl_hours: 24

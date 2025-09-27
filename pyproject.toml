@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=65", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "env-agents"
+version = "2.0.0"
+description = "Ontology-aware adapters that fetch and harmonize environmental data into tidy tables."
+readme = "README.md"
+requires-python = ">=3.9"
+authors = [{name="Your Team", email="you@example.org"}]
+dependencies = [
+  "pandas>=2.0",
+  "pyarrow>=15",
+  "requests>=2.32",
+  "pydantic>=2.0",
+  "shapely>=2.0"
+]
+
+[project.scripts]
+ea = "env_agents.cli.ea:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["env_agents*"]
+
+[tool.setuptools.package-data]
+"env_agents.credentials" = ["*.json"]

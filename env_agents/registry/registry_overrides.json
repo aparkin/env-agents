@@ -1,0 +1,18 @@
+{
+  "variables": {
+    "atm:air_temperature_2m": {
+      "label": "2 m air temperature",
+      "observed_property_uri": "http://vocab.nerc.ac.uk/standard_name/air_temperature",
+      "preferred_unit": "°C",
+      "unit_uri": "http://qudt.org/vocab/unit/DEG_C",
+      "datasets": { "NASA_POWER": { "native": "T2M" } }
+    },
+    "atm:precip_total": {
+      "label": "Total precipitation",
+      "observed_property_uri": "http://vocab.nerc.ac.uk/standard_name/precipitation_amount",
+      "preferred_unit": "mm",
+      "unit_uri": "http://qudt.org/vocab/unit/MilliM",
+      "datasets": { "NASA_POWER": { "native": "PRECTOTCORR" } }
+    }
+  }
+}

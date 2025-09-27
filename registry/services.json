@@ -1,0 +1,39 @@
+{
+  "version": "1.0",
+  "updated": "2025-09-13T14:01:44.929094",
+  "services": [
+    {
+      "service_id": "TEST",
+      "title": "TEST Data Service",
+      "description": "Environmental data service",
+      "provider": "Unknown Provider",
+      "source_url": "https://test.com",
+      "license": "Test",
+      "version": "1.0",
+      "domains": [
+        "test"
+      ],
+      "variables": [
+        {
+          "id": "test",
+          "canonical": null,
+          "name": "Test",
+          "description": "Test variable",
+          "unit": "test",
+          "domain": null
+        }
+      ],
+      "spatial_coverage": "Coverage information not available",
+      "temporal_coverage": "Temporal coverage not specified",
+      "authentication_required": false,
+      "authentication_type": "none",
+      "reliability_score": 0.1,
+      "data_quality_score": 0.0,
+      "completeness_score": 0.9,
+      "overall_quality_score": 0.4,
+      "last_updated": "2025-09-13T14:01:44.923578",
+      "tags": [],
+      "notes": ""
+    }
+  ]
+}

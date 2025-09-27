@@ -1,0 +1,10 @@
+{
+  "catalog_info": {
+    "title": "Unified Environmental Data Services Catalog",
+    "description": "Combined catalog of env-agents services and Earth Engine assets",
+    "version": "1.0.0",
+    "total_services": 0,
+    "generated_at": "2025-09-09T08:06:12.377963"
+  },
+  "services": []
+}

@@ -1,0 +1,320 @@
+{
+  "v2/aeo/{route1}": {
+    "facets": {},
+    "path": "/v2/aeo/{route1}/data",
+    "data_vars": [],
+    "description": "API data with query params"
+  },
+  "v2/ieo/{route1}": {
+    "facets": {},
+    "path": "/v2/ieo/{route1}/data",
+    "data_vars": [],
+    "description": "API data with query params"
+  },
+  "v2/natural-gas/{route1}/{route2}": {
+    "facets": {},
+    "path": "/v2/natural-gas/{route1}/{route2}/data",
+    "data_vars": [],
+    "description": "API data with query params"
+  },
+  "v2/seds": {
+    "facets": {},
+    "path": "/v2/seds/data",
+    "data_vars": [],
+    "description": "API data with query params"
+  },
+  "v2/steo": {
+    "facets": {},
+    "path": "/v2/steo/data",
+    "data_vars": [],
+    "description": "API data with query params"
+  },
+  "v2/co2-emissions/co2-emissions-aggregates": {
+    "facets": {},
+    "path": "/v2/co2-emissions/co2-emissions-aggregates/data",
+    "data_vars": [],
+    "description": "API data with query params"
+  },
+  "v2/co2-emissions/co2-emissions-and-carbon-coefficients": {
+    "facets": {},
+    "path": "/v2/co2-emissions/co2-emissions-and-carbon-coefficients/data",
+    "data_vars": [],
+    "description": "API data with query params"
+  },
+  "v2/coal/aggregate-production": {
+    "facets": {},
+    "path": "/v2/coal/aggregate-production/data",
+    "data_vars": [],
+    "description": "API data with query params"
+  },
+  "v2/coal/consumption-and-quality": {
+    "facets": {},
+    "path": "/v2/coal/consumption-and-quality/data",
+    "data_vars": [],
+    "description": "API data with query params"
+  },
+  "v2/coal/exports-imports-quantity-price": {
+    "facets": {},
+    "path": "/v2/coal/exports-imports-quantity-price/data",
+    "data_vars": [],
+    "description": "API data with query params"
+  },
+  "v2/coal/market-sales-price": {
+    "facets": {},
+    "path": "/v2/coal/market-sales-price/data",
+    "data_vars": [],
+    "description": "API data with query params"
+  },
+  "v2/coal/mine-production": {
+    "facets": {},
+    "path": "/v2/coal/mine-production/data",
+    "data_vars": [],
+    "description": "API data with query params"
+  },
+  "v2/coal/price-by-rank": {
+    "facets": {},
+    "path": "/v2/coal/price-by-rank/data",
+    "data_vars": [],
+    "description": "API data with query params"
+  },
+  "v2/coal/reserves-capacity": {
+    "facets": {},
+    "path": "/v2/coal/reserves-capacity/data",
+    "data_vars": [],
+    "description": "API data with query params"
+  },
+  "v2/coal/shipments/by-mine-by-plant": {
+    "facets": {},
+    "path": "/v2/coal/shipments/by-mine-by-plant/data",
+    "data_vars": [],
+    "description": "API data with query params"
+  },
+  "v2/coal/shipments/mine-aggregates": {
+    "facets": {},
+    "path": "/v2/coal/shipments/mine-aggregates/data",
+    "data_vars": [],
+    "description": "API data with query params"
+  },
+  "v2/coal/shipments/mine-state-aggregates": {
+    "facets": {},
+    "path": "/v2/coal/shipments/mine-state-aggregates/data",
+    "data_vars": [],
+    "description": "API data with query params"
+  },
+  "v2/coal/shipments/plant-aggregates": {
+    "facets": {},
+    "path": "/v2/coal/shipments/plant-aggregates/data",
+    "data_vars": [],
+    "description": "API data with query params"
+  },
+  "v2/coal/shipments/plant-state-aggregates": {
+    "facets": {},
+    "path": "/v2/coal/shipments/plant-state-aggregates/data",
+    "data_vars": [],
+    "description": "API data with query params"
+  },
+  "v2/coal/shipments/receipts": {
+    "facets": {},
+    "path": "/v2/coal/shipments/receipts/data",
+    "data_vars": [],
+    "description": "API data with query params"
+  },
+  "v2/crude-oil-imports": {
+    "facets": {},
+    "path": "/v2/crude-oil-imports/data",
+    "data_vars": [],
+    "description": "API data with query params"
+  },
+  "v2/densified-biomass/capacity-by-region": {
+    "facets": {},
+    "path": "/v2/densified-biomass/capacity-by-region/data",
+    "data_vars": [],
+    "description": "API data with query params"
+  },
+  "v2/densified-biomass/characteristics-by-region": {
+    "facets": {},
+    "path": "/v2/densified-biomass/characteristics-by-region/data",
+    "data_vars": [],
+    "description": "API data with query params"
+  },
+  "v2/densified-biomass/export-sales-and-price": {
+    "facets": {},
+    "path": "/v2/densified-biomass/export-sales-and-price/data",
+    "data_vars": [],
+    "description": "API data with query params"
+  },
+  "v2/densified-biomass/feedstocks-and-cost": {
+    "facets": {},
+    "path": "/v2/densified-biomass/feedstocks-and-cost/data",
+    "data_vars": [],
+    "description": "API data with query params"
+  },
+  "v2/densified-biomass/inventories-by-region": {
+    "facets": {},
+    "path": "/v2/densified-biomass/inventories-by-region/data",
+    "data_vars": [],
+    "description": "API data with query params"
+  },
+  "v2/densified-biomass/production-by-region": {
+    "facets": {},
+    "path": "/v2/densified-biomass/production-by-region/data",
+    "data_vars": [],
+    "description": "API data with query params"
+  },
+  "v2/densified-biomass/sales-and-price-by-region": {
+    "facets": {},
+    "path": "/v2/densified-biomass/sales-and-price-by-region/data",
+    "data_vars": [],
+    "description": "API data with query params"
+  },
+  "v2/densified-biomass/wood-pellet-plants": {
+    "facets": {},
+    "path": "/v2/densified-biomass/wood-pellet-plants/data",
+    "data_vars": [],
+    "description": "API data with query params"
+  },
+  "v2/electricity/facility-fuel": {
+    "facets": {},
+    "path": "/v2/electricity/facility-fuel/data",
+    "data_vars": [],
+    "description": "API data with query params"
+  },
+  "v2/electricity/electric-power-operational-data": {
+    "facets": {},
+    "path": "/v2/electricity/electric-power-operational-data/data",
+    "data_vars": [],
+    "description": "API data with query params"
+  },
+  "v2/electricity/operating-generator-capacity": {
+    "facets": {},
+    "path": "/v2/electricity/operating-generator-capacity/data",
+    "data_vars": [],
+    "description": "API data with query params"
+  },
+  "v2/electricity/retail-sales": {
+    "facets": {},
+    "path": "/v2/electricity/retail-sales/data",
+    "data_vars": [],
+    "description": "API data with query params"
+  },
+  "v2/electricity/state-electricity-profiles/capability": {
+    "facets": {},
+    "path": "/v2/electricity/state-electricity-profiles/capability/data",
+    "data_vars": [],
+    "description": "API data with query params"
+  },
+  "v2/electricity/state-electricity-profiles/emissions-by-state-by-fuel": {
+    "facets": {},
+    "path": "/v2/electricity/state-electricity-profiles/emissions-by-state-by-fuel/data",
+    "data_vars": [],
+    "description": "API data with query params"
+  },
+  "v2/electricity/state-electricity-profiles/energy-efficiency": {
+    "facets": {},
+    "path": "/v2/electricity/state-electricity-profiles/energy-efficiency/data",
+    "data_vars": [],
+    "description": "API data with query params"
+  },
+  "v2/electricity/state-electricity-profiles/meters": {
+    "facets": {},
+    "path": "/v2/electricity/state-electricity-profiles/meters/data",
+    "data_vars": [],
+    "description": "API data with query params"
+  },
+  "v2/electricity/state-electricity-profiles/net-metering": {
+    "facets": {},
+    "path": "/v2/electricity/state-electricity-profiles/net-metering/data",
+    "data_vars": [],
+    "description": "API data with query params"
+  },
+  "v2/electricity/state-electricity-profiles/source-disposition": {
+    "facets": {},
+    "path": "/v2/electricity/state-electricity-profiles/source-disposition/data",
+    "data_vars": [],
+    "description": "API data with query params"
+  },
+  "v2/electricity/state-electricity-profiles/summary": {
+    "facets": {},
+    "path": "/v2/electricity/state-electricity-profiles/summary/data",
+    "data_vars": [],
+    "description": "API data with query params"
+  },
+  "v2/electricity/rto/daily-interchange-data": {
+    "facets": {},
+    "path": "/v2/electricity/rto/daily-interchange-data/data",
+    "data_vars": [],
+    "description": "API data with query params"
+  },
+  "v2/electricity/rto/daily-fuel-type-data": {
+    "facets": {},
+    "path": "/v2/electricity/rto/daily-fuel-type-data/data",
+    "data_vars": [],
+    "description": "API data with query params"
+  },
+  "v2/electricity/rto/daily-region-sub-ba-data": {
+    "facets": {},
+    "path": "/v2/electricity/rto/daily-region-sub-ba-data/data",
+    "data_vars": [],
+    "description": "API data with query params"
+  },
+  "v2/electricity/rto/daily-region-data": {
+    "facets": {},
+    "path": "/v2/electricity/rto/daily-region-data/data",
+    "data_vars": [],
+    "description": "API data with query params"
+  },
+  "v2/electricity/rto/interchange-data": {
+    "facets": {},
+    "path": "/v2/electricity/rto/interchange-data/data",
+    "data_vars": [],
+    "description": "API data with query params"
+  },
+  "v2/electricity/rto/fuel-type-data": {
+    "facets": {},
+    "path": "/v2/electricity/rto/fuel-type-data/data",
+    "data_vars": [],
+    "description": "API data with query params"
+  },
+  "v2/electricity/rto/region-sub-ba-data": {
+    "facets": {},
+    "path": "/v2/electricity/rto/region-sub-ba-data/data",
+    "data_vars": [],
+    "description": "API data with query params"
+  },
+  "v2/electricity/rto/region-data": {
+    "facets": {},
+    "path": "/v2/electricity/rto/region-data/data",
+    "data_vars": [],
+    "description": "API data with query params"
+  },
+  "v2/international": {
+    "facets": {},
+    "path": "/v2/international/data",
+    "data_vars": [],
+    "description": "API data with query params"
+  },
+  "v2/nuclear-outages/facility-nuclear-outages": {
+    "facets": {},
+    "path": "/v2/nuclear-outages/facility-nuclear-outages/data",
+    "data_vars": [],
+    "description": "API data with query params"
+  },
+  "v2/nuclear-outages/generator-nuclear-outages": {
+    "facets": {},
+    "path": "/v2/nuclear-outages/generator-nuclear-outages/data",
+    "data_vars": [],
+    "description": "API data with query params"
+  },
+  "v2/nuclear-outages/us-nuclear-outages": {
+    "facets": {},
+    "path": "/v2/nuclear-outages/us-nuclear-outages/data",
+    "data_vars": [],
+    "description": "API data with query params"
+  },
+  "v2/total-energy": {
+    "facets": {},
+    "path": "/v2/total-energy/data",
+    "data_vars": [],
+    "description": "API data with query params"
+  }
+}

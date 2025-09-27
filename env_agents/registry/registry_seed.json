@@ -1,0 +1,69 @@
+{
+  "variables": {
+    "air:pm25": {
+      "label": "PM2.5 mass concentration in air",
+      "observed_property_uri": "http://vocab.nerc.ac.uk/standard_name/mass_concentration_of_pm2p5_in_air",
+      "preferred_unit": "µg/m3",
+      "unit_uri": "http://qudt.org/vocab/unit/MicroGM-PER-M3",
+      "alt_units": [
+        "mg/m3"
+      ],
+      "unit_conversions": {
+        "mg/m3": 1000.0
+      },
+      "ontology": [
+        "CF",
+        "QUDT"
+      ],
+      "datasets": {
+        "EPA_AQS_v3": {
+          "native": "88101"
+        },
+        "OpenAQ_v3": {
+          "native": "pm25"
+        }
+      }
+    },
+    "water:discharge_cfs": {
+      "label": "Stream discharge",
+      "observed_property_uri": "http://vocab.nerc.ac.uk/standard_name/water_volume_transport_in_river_channel",
+      "preferred_unit": "ft3/s",
+      "unit_uri": "http://qudt.org/vocab/unit/FT3-PER-SEC",
+      "alt_units": [
+        "m3/s"
+      ],
+      "unit_conversions": {
+        "m3/s": 35.3146667
+      },
+      "ontology": [
+        "CF",
+        "QUDT"
+      ],
+      "datasets": {
+        "USGS_NWIS": {
+          "native": "00060"
+        }
+      }
+    }
+  },
+  "units": {
+    "µg/m3": {
+      "uri": "http://qudt.org/vocab/unit/MicroGM-PER-M3",
+      "ucum": "ug/m3"
+    },
+    "m3/s": {
+      "uri": "http://qudt.org/vocab/unit/M3-PER-SEC",
+      "ucum": "m3/s"
+    },
+    "ft3/s": {
+      "uri": "http://qudt.org/vocab/unit/FT3-PER-SEC",
+      "ucum": "[ft_i]3/s"
+    },
+    "%": {
+      "uri": "http://qudt.org/vocab/unit/PERCENT",
+      "ucum": "%"
+    }
+  },
+  "methods": {},
+  "qc_flags": {}
+}

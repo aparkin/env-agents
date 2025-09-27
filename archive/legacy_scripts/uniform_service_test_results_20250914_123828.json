@@ -1,0 +1,1095 @@
+{
+  "test_execution": {
+    "timestamp": "2025-09-14T12:38:28.004196",
+    "total_tests": 11,
+    "test_framework_version": "1.0"
+  },
+  "test_results": [
+    {
+      "test_id": "openaq_los_angeles",
+      "service_name": "OpenAQEnhanced",
+      "location_name": "Los Angeles, CA",
+      "timestamp": "2025-09-14T12:37:13.400190",
+      "request_spec": {
+        "test_id": "openaq_los_angeles",
+        "service_name": "OpenAQEnhanced",
+        "location_name": "Los Angeles, CA",
+        "latitude": 34.0522,
+        "longitude": -118.2437,
+        "start_date": "2024-08-01",
+        "end_date": "2024-08-31",
+        "variables": [
+          "pm25",
+          "pm10"
+        ],
+        "extra_params": {
+          "radius": 15000
+        },
+        "expected_records_min": 100,
+        "timeout_seconds": 30
+      },
+      "result_status": "TestResult.SUCCESS",
+      "records_retrieved": 6000,
+      "variables_found": [
+        "air:pm10",
+        "air:pm25"
+      ],
+      "execution_time_seconds": 14.78,
+      "null_coordinates": 6000,
+      "null_timestamps": 0,
+      "null_values": 0,
+      "duplicate_records": "0",
+      "sample_record": {
+        "dataset": "OpenAQ",
+        "source_url": "https://api.openaq.org/v3",
+        "source_version": "v3",
+        "license": "https://docs.openaq.org/about/about#terms-of-use",
+        "geometry_type": "point",
+        "latitude": null,
+        "longitude": null,
+        "spatial_id": "2773",
+        "time": "2016-03-06T20:00:00Z",
+        "variable": "air:pm10",
+        "value": 26.0,
+        "unit": "\u00b5g/m\u00b3",
+        "qc_flag": "ok"
+      },
+      "value_ranges": {
+        "air:pm10": {
+          "min": 0.0,
+          "max": 345.16,
+          "mean": 26.9323
+        },
+        "air:pm25": {
+          "min": 0.0,
+          "max": 268.71,
+          "mean": 12.675434014333113
+        }
+      },
+      "error_message": null,
+      "error_type": null,
+      "stack_trace": null,
+      "unique_locations": 12,
+      "temporal_coverage": {
+        "start": "2016-03-06T20:00:00+00:00",
+        "end": "2025-04-23T11:00:00+00:00",
+        "unique_timestamps": 3637
+      },
+      "capabilities_summary": {
+        "total_variables": 40,
+        "enhancement_level": "earth_engine_gold_standard",
+        "requires_auth": true
+      }
+    },
+    {
+      "test_id": "openaq_delhi",
+      "service_name": "OpenAQEnhanced",
+      "location_name": "Delhi, India",
+      "timestamp": "2025-09-14T12:37:29.396810",
+      "request_spec": {
+        "test_id": "openaq_delhi",
+        "service_name": "OpenAQEnhanced",
+        "location_name": "Delhi, India",
+        "latitude": 28.7041,
+        "longitude": 77.1025,
+        "start_date": "2024-08-01",
+        "end_date": "2024-08-31",
+        "variables": [
+          "pm25",
+          "pm10"
+        ],
+        "extra_params": {
+          "radius": 20000
+        },
+        "expected_records_min": 50,
+        "timeout_seconds": 30
+      },
+      "result_status": "TestResult.NO_DATA",
+      "records_retrieved": 0,
+      "variables_found": [],
+      "execution_time_seconds": 14.06,
+      "null_coordinates": 0,
+      "null_timestamps": 0,
+      "null_values": 0,
+      "duplicate_records": 0,
+      "sample_record": null,
+      "value_ranges": null,
+      "error_message": "Service returned empty result set",
+      "error_type": null,
+      "stack_trace": null,
+      "unique_locations": 0,
+      "temporal_coverage": null,
+      "capabilities_summary": {
+        "total_variables": 40,
+        "enhancement_level": "earth_engine_gold_standard",
+        "requires_auth": true
+      }
+    },
+    {
+      "test_id": "nasa_power_global_1",
+      "service_name": "NASAPOWEREnhanced",
+      "location_name": "Chicago, IL",
+      "timestamp": "2025-09-14T12:37:44.461664",
+      "request_spec": {
+        "test_id": "nasa_power_global_1",
+        "service_name": "NASAPOWEREnhanced",
+        "location_name": "Chicago, IL",
+        "latitude": 41.8781,
+        "longitude": -87.6298,
+        "start_date": "2024-08-01",
+        "end_date": "2024-08-31",
+        "variables": [
+          "T2M",
+          "PRECTOTCORR"
+        ],
+        "extra_params": {},
+        "expected_records_min": 30,
+        "timeout_seconds": 30
+      },
+      "result_status": "TestResult.SUCCESS",
+      "records_retrieved": 62,
+      "variables_found": [
+        "atm:t2m",
+        "atm:precip"
+      ],
+      "execution_time_seconds": 3.91,
+      "null_coordinates": 0,
+      "null_timestamps": 0,
+      "null_values": 0,
+      "duplicate_records": "0",
+      "sample_record": {
+        "dataset": "NASA_POWER",
+        "source_url": "https://power.larc.nasa.gov/api/temporal/daily/point",
+        "source_version": "current",
+        "license": "https://power.larc.nasa.gov/docs/services/",
+        "retrieval_timestamp": "2025-09-14T19:37:48.372262+00:00",
+        "geometry_type": "point",
+        "latitude": 41.8781,
+        "longitude": -87.6298,
+        "time": "2024-08-01",
+        "variable": "atm:t2m",
+        "value": 25.43,
+        "unit": "C",
+        "qc_flag": "ok"
+      },
+      "value_ranges": {
+        "atm:t2m": {
+          "min": 19.23,
+          "max": 27.66,
+          "mean": 23.193870967741937
+        },
+        "atm:precip": {
+          "min": 0.0,
+          "max": 13.52,
+          "mean": 2.5138709677419353
+        }
+      },
+      "error_message": null,
+      "error_type": null,
+      "stack_trace": null,
+      "unique_locations": 0,
+      "temporal_coverage": {
+        "start": "2024-08-01T00:00:00",
+        "end": "2024-08-31T00:00:00",
+        "unique_timestamps": 31
+      },
+      "capabilities_summary": {
+        "total_variables": 6,
+        "enhancement_level": "earth_engine_gold_standard",
+        "requires_auth": false
+      }
+    },
+    {
+      "test_id": "nasa_power_global_2",
+      "service_name": "NASAPOWEREnhanced",
+      "location_name": "S\u00e3o Paulo, Brazil",
+      "timestamp": "2025-09-14T12:37:49.382220",
+      "request_spec": {
+        "test_id": "nasa_power_global_2",
+        "service_name": "NASAPOWEREnhanced",
+        "location_name": "S\u00e3o Paulo, Brazil",
+        "latitude": -23.5505,
+        "longitude": -46.6333,
+        "start_date": "2024-01-01",
+        "end_date": "2024-01-31",
+        "variables": [
+          "T2M",
+          "RH2M"
+        ],
+        "extra_params": {},
+        "expected_records_min": 30,
+        "timeout_seconds": 30
+      },
+      "result_status": "TestResult.SUCCESS",
+      "records_retrieved": 62,
+      "variables_found": [
+        "atm:t2m",
+        "atm:rh2m"
+      ],
+      "execution_time_seconds": 2.99,
+      "null_coordinates": 0,
+      "null_timestamps": 0,
+      "null_values": 0,
+      "duplicate_records": "0",
+      "sample_record": {
+        "dataset": "NASA_POWER",
+        "source_url": "https://power.larc.nasa.gov/api/temporal/daily/point",
+        "source_version": "current",
+        "license": "https://power.larc.nasa.gov/docs/services/",
+        "retrieval_timestamp": "2025-09-14T19:37:52.374705+00:00",
+        "geometry_type": "point",
+        "latitude": -23.5505,
+        "longitude": -46.6333,
+        "time": "2024-01-01",
+        "variable": "atm:t2m",
+        "value": 23.15,
+        "unit": "C",
+        "qc_flag": "ok"
+      },
+      "value_ranges": {
+        "atm:t2m": {
+          "min": 18.94,
+          "max": 27.38,
+          "mean": 23.853870967741933
+        },
+        "atm:rh2m": {
+          "min": 62.12,
+          "max": 89.58,
+          "mean": 75.38516129032257
+        }
+      },
+      "error_message": null,
+      "error_type": null,
+      "stack_trace": null,
+      "unique_locations": 0,
+      "temporal_coverage": {
+        "start": "2024-01-01T00:00:00",
+        "end": "2024-01-31T00:00:00",
+        "unique_timestamps": 31
+      },
+      "capabilities_summary": {
+        "total_variables": 6,
+        "enhancement_level": "earth_engine_gold_standard",
+        "requires_auth": false
+      }
+    },
+    {
+      "test_id": "usgs_colorado_river",
+      "service_name": "USGSNWISEnhanced",
+      "location_name": "Colorado River - Grand Canyon",
+      "timestamp": "2025-09-14T12:37:53.387219",
+      "request_spec": {
+        "test_id": "usgs_colorado_river",
+        "service_name": "USGSNWISEnhanced",
+        "location_name": "Colorado River - Grand Canyon",
+        "latitude": 36.1069,
+        "longitude": -112.1129,
+        "start_date": "2024-08-01",
+        "end_date": "2024-08-31",
+        "variables": [
+          "00060",
+          "00065"
+        ],
+        "extra_params": {
+          "radius": 50000
+        },
+        "expected_records_min": 10,
+        "timeout_seconds": 30
+      },
+      "result_status": "TestResult.SUCCESS",
+      "records_retrieved": 31,
+      "variables_found": [
+        "water:discharge_cfs"
+      ],
+      "execution_time_seconds": 4.22,
+      "null_coordinates": 0,
+      "null_timestamps": 0,
+      "null_values": 0,
+      "duplicate_records": "0",
+      "sample_record": {
+        "dataset": "USGS_NWIS",
+        "source_url": "https://waterservices.usgs.gov/nwis/dv/?format=json&sites=09402500%2C09402501%2C09402502%2C09402503%2C09402599%2C09403000%2C09403010%2C09403012%2C09403013%2C09403015&parameterCd=00060%2C00065&startDT=2024-08-01&endDT=2024-08-31&statCd=00003",
+        "source_version": "current",
+        "license": "https://www.usgs.gov/",
+        "geometry_type": "point",
+        "latitude": 36.10137176,
+        "longitude": -112.0862795,
+        "spatial_id": "09402500",
+        "time": "2024-08-01",
+        "temporal_coverage": "daily mean",
+        "variable": "water:discharge_cfs",
+        "value": 12600.0,
+        "unit": "ft3/s",
+        "qc_flag": "ok"
+      },
+      "value_ranges": {
+        "water:discharge_cfs": {
+          "min": 12600.0,
+          "max": 15000.0,
+          "mean": 13438.709677419354
+        }
+      },
+      "error_message": null,
+      "error_type": null,
+      "stack_trace": null,
+      "unique_locations": 1,
+      "temporal_coverage": {
+        "start": "2024-08-01T00:00:00",
+        "end": "2024-08-31T00:00:00",
+        "unique_timestamps": 31
+      },
+      "capabilities_summary": {
+        "total_variables": 15,
+        "enhancement_level": "earth_engine_gold_standard",
+        "requires_auth": false
+      }
+    },
+    {
+      "test_id": "usgs_mississippi",
+      "service_name": "USGSNWISEnhanced",
+      "location_name": "Mississippi River - St. Louis",
+      "timestamp": "2025-09-14T12:37:58.618773",
+      "request_spec": {
+        "test_id": "usgs_mississippi",
+        "service_name": "USGSNWISEnhanced",
+        "location_name": "Mississippi River - St. Louis",
+        "latitude": 38.627,
+        "longitude": -90.1994,
+        "start_date": "2024-08-01",
+        "end_date": "2024-08-31",
+        "variables": [
+          "00060",
+          "00010"
+        ],
+        "extra_params": {
+          "radius": 25000
+        },
+        "expected_records_min": 20,
+        "timeout_seconds": 30
+      },
+      "result_status": "TestResult.SUCCESS",
+      "records_retrieved": 31,
+      "variables_found": [
+        "water:discharge_cfs"
+      ],
+      "execution_time_seconds": 3.58,
+      "null_coordinates": 0,
+      "null_timestamps": 0,
+      "null_values": 0,
+      "duplicate_records": "0",
+      "sample_record": {
+        "dataset": "USGS_NWIS",
+        "source_url": "https://waterservices.usgs.gov/nwis/dv/?format=json&sites=07010000%2C383519090104701%2C383559090101501%2C383737090134801%2C383800090120001%2C383950090104501%2C383955090104701%2C384017090111100%2C384017090111101%2C384018090115901&parameterCd=00010%2C00060&startDT=2024-08-01&endDT=2024-08-31&statCd=00003",
+        "source_version": "current",
+        "license": "https://www.usgs.gov/",
+        "geometry_type": "point",
+        "latitude": 38.629,
+        "longitude": -90.1797778,
+        "spatial_id": "07010000",
+        "time": "2024-08-01",
+        "temporal_coverage": "daily mean",
+        "variable": "water:discharge_cfs",
+        "value": 277000.0,
+        "unit": "ft3/s",
+        "qc_flag": "ok"
+      },
+      "value_ranges": {
+        "water:discharge_cfs": {
+          "min": 115000.0,
+          "max": 285000.0,
+          "mean": 184806.4516129032
+        }
+      },
+      "error_message": null,
+      "error_type": null,
+      "stack_trace": null,
+      "unique_locations": 1,
+      "temporal_coverage": {
+        "start": "2024-08-01T00:00:00",
+        "end": "2024-08-31T00:00:00",
+        "unique_timestamps": 31
+      },
+      "capabilities_summary": {
+        "total_variables": 15,
+        "enhancement_level": "earth_engine_gold_standard",
+        "requires_auth": false
+      }
+    },
+    {
+      "test_id": "soilgrids_iowa_agriculture",
+      "service_name": "SoilGridsEnhanced",
+      "location_name": "Iowa Corn Belt",
+      "timestamp": "2025-09-14T12:38:03.206208",
+      "request_spec": {
+        "test_id": "soilgrids_iowa_agriculture",
+        "service_name": "SoilGridsEnhanced",
+        "location_name": "Iowa Corn Belt",
+        "latitude": 42.0308,
+        "longitude": -93.6319,
+        "start_date": "2024-01-01",
+        "end_date": "2024-12-31",
+        "variables": [
+          "clay",
+          "sand",
+          "phh2o"
+        ],
+        "extra_params": {
+          "depth": "0-5cm"
+        },
+        "expected_records_min": 1,
+        "timeout_seconds": 30
+      },
+      "result_status": "TestResult.SUCCESS",
+      "records_retrieved": 3,
+      "variables_found": [
+        "soil:clay_content_percent",
+        "soil:sand_content_percent",
+        "soil:ph_h2o"
+      ],
+      "execution_time_seconds": 5.16,
+      "null_coordinates": 0,
+      "null_timestamps": 3,
+      "null_values": 0,
+      "duplicate_records": "0",
+      "sample_record": {
+        "observation_id": "soilgrids_clay_42.0308_-93.6319",
+        "dataset": "SoilGrids",
+        "source_url": "https://maps.isric.org/mapserv",
+        "source_version": "v2.0",
+        "license": "https://creativecommons.org/licenses/by/4.0/",
+        "retrieval_timestamp": "2025-09-14 19:38:06.732444+00:00",
+        "geometry_type": "point",
+        "latitude": 42.0308,
+        "longitude": -93.6319,
+        "geom_wkt": "POINT(-93.6319 42.0308)",
+        "spatial_id": "soilgrids_42.0308_-93.6319",
+        "site_name": "SoilGrids Point 42.0308, -93.6319",
+        "admin": "",
+        "elevation_m": null,
+        "time": null,
+        "temporal_coverage": "static_soil_properties",
+        "variable": "soil:clay_content_percent",
+        "value": 1.0,
+        "unit": "%",
+        "depth_top_cm": 0,
+        "depth_bottom_cm": 5,
+        "qc_flag": "ok"
+      },
+      "value_ranges": {
+        "soil:clay_content_percent": {
+          "min": 1.0,
+          "max": 1.0,
+          "mean": 1.0
+        },
+        "soil:sand_content_percent": {
+          "min": 1.0,
+          "max": 1.0,
+          "mean": 1.0
+        },
+        "soil:ph_h2o": {
+          "min": 1.0,
+          "max": 1.0,
+          "mean": 1.0
+        }
+      },
+      "error_message": null,
+      "error_type": null,
+      "stack_trace": null,
+      "unique_locations": 1,
+      "temporal_coverage": null,
+      "capabilities_summary": {
+        "total_variables": 12,
+        "enhancement_level": "earth_engine_gold_standard",
+        "requires_auth": false
+      }
+    },
+    {
+      "test_id": "soilgrids_kenya_agriculture",
+      "service_name": "SoilGridsEnhanced",
+      "location_name": "Kenya Highlands",
+      "timestamp": "2025-09-14T12:38:09.374430",
+      "request_spec": {
+        "test_id": "soilgrids_kenya_agriculture",
+        "service_name": "SoilGridsEnhanced",
+        "location_name": "Kenya Highlands",
+        "latitude": -0.0236,
+        "longitude": 37.9062,
+        "start_date": "2024-01-01",
+        "end_date": "2024-12-31",
+        "variables": [
+          "clay",
+          "silt"
+        ],
+        "extra_params": {
+          "depth": "0-30cm"
+        },
+        "expected_records_min": 1,
+        "timeout_seconds": 30
+      },
+      "result_status": "TestResult.SUCCESS",
+      "records_retrieved": 2,
+      "variables_found": [
+        "soil:clay_content_percent",
+        "soil:silt_content_percent"
+      ],
+      "execution_time_seconds": 6.3,
+      "null_coordinates": 0,
+      "null_timestamps": 2,
+      "null_values": 0,
+      "duplicate_records": "0",
+      "sample_record": {
+        "observation_id": "soilgrids_clay_-0.0236_37.9062",
+        "dataset": "SoilGrids",
+        "source_url": "https://maps.isric.org/mapserv",
+        "source_version": "v2.0",
+        "license": "https://creativecommons.org/licenses/by/4.0/",
+        "retrieval_timestamp": "2025-09-14 19:38:14.459962+00:00",
+        "geometry_type": "point",
+        "latitude": -0.0236,
+        "longitude": 37.9062,
+        "geom_wkt": "POINT(37.9062 -0.0236)",
+        "spatial_id": "soilgrids_-0.0236_37.9062",
+        "site_name": "SoilGrids Point -0.0236, 37.9062",
+        "admin": "",
+        "elevation_m": null,
+        "time": null,
+        "temporal_coverage": "static_soil_properties",
+        "variable": "soil:clay_content_percent",
+        "value": 1.0,
+        "unit": "%",
+        "depth_top_cm": 0,
+        "depth_bottom_cm": 5,
+        "qc_flag": "ok"
+      },
+      "value_ranges": {
+        "soil:clay_content_percent": {
+          "min": 1.0,
+          "max": 1.0,
+          "mean": 1.0
+        },
+        "soil:silt_content_percent": {
+          "min": 1.0,
+          "max": 1.0,
+          "mean": 1.0
+        }
+      },
+      "error_message": null,
+      "error_type": null,
+      "stack_trace": null,
+      "unique_locations": 1,
+      "temporal_coverage": null,
+      "capabilities_summary": {
+        "total_variables": 12,
+        "enhancement_level": "earth_engine_gold_standard",
+        "requires_auth": false
+      }
+    },
+    {
+      "test_id": "gbif_costa_rica_biodiversity",
+      "service_name": "GBIFEnhanced",
+      "location_name": "Costa Rica - Monteverde",
+      "timestamp": "2025-09-14T12:38:16.677471",
+      "request_spec": {
+        "test_id": "gbif_costa_rica_biodiversity",
+        "service_name": "GBIFEnhanced",
+        "location_name": "Costa Rica - Monteverde",
+        "latitude": 10.3009,
+        "longitude": -84.8015,
+        "start_date": "2024-01-01",
+        "end_date": "2024-12-31",
+        "variables": [
+          "occurrence"
+        ],
+        "extra_params": {
+          "radius": 10000,
+          "limit": 200
+        },
+        "expected_records_min": 50,
+        "timeout_seconds": 30
+      },
+      "result_status": "TestResult.SUCCESS",
+      "records_retrieved": 300,
+      "variables_found": [
+        "Animal Occurrences",
+        "Plant Occurrences",
+        "Fungi Occurrences"
+      ],
+      "execution_time_seconds": 3.43,
+      "null_coordinates": 0,
+      "null_timestamps": 0,
+      "null_values": 0,
+      "duplicate_records": "156",
+      "sample_record": {
+        "observation_id": "gbif_1632777577",
+        "dataset": "GBIF_Enhanced",
+        "source_url": "https://api.gbif.org/v1",
+        "source_version": "v1.0",
+        "license": "https://creativecommons.org/licenses/by/4.0/",
+        "retrieval_timestamp": "2025-09-14T19:38:20.103812+00:00",
+        "geometry_type": "point",
+        "latitude": -33.88,
+        "longitude": 151.22,
+        "geom_wkt": "POINT(151.22 -33.88)",
+        "spatial_id": null,
+        "site_name": "Sydney | Sydney",
+        "admin": "Australia",
+        "elevation_m": null,
+        "time": "2025-01-24",
+        "temporal_coverage": "occurrence_date",
+        "variable": "Animal Occurrences",
+        "value": 1.0,
+        "unit": "count",
+        "depth_top_cm": null,
+        "depth_bottom_cm": null,
+        "qc_flag": "gbif_validated"
+      },
+      "value_ranges": {
+        "Animal Occurrences": {
+          "min": 1.0,
+          "max": 1.0,
+          "mean": 1.0
+        },
+        "Plant Occurrences": {
+          "min": 1.0,
+          "max": 1.0,
+          "mean": 1.0
+        },
+        "Fungi Occurrences": {
+          "min": 1.0,
+          "max": 1.0,
+          "mean": 1.0
+        }
+      },
+      "error_message": null,
+      "error_type": null,
+      "stack_trace": null,
+      "unique_locations": 0,
+      "temporal_coverage": {
+        "start": "2025-01-01T00:00:00",
+        "end": "2025-01-31T00:00:00",
+        "unique_timestamps": 11
+      },
+      "capabilities_summary": {
+        "total_variables": 8,
+        "enhancement_level": "earth_engine_gold_standard",
+        "requires_auth": false
+      }
+    },
+    {
+      "test_id": "gbif_yellowstone_biodiversity",
+      "service_name": "GBIFEnhanced",
+      "location_name": "Yellowstone National Park",
+      "timestamp": "2025-09-14T12:38:21.131073",
+      "request_spec": {
+        "test_id": "gbif_yellowstone_biodiversity",
+        "service_name": "GBIFEnhanced",
+        "location_name": "Yellowstone National Park",
+        "latitude": 44.428,
+        "longitude": -110.5885,
+        "start_date": "2024-06-01",
+        "end_date": "2024-08-31",
+        "variables": [
+          "occurrence"
+        ],
+        "extra_params": {
+          "radius": 15000,
+          "limit": 300
+        },
+        "expected_records_min": 100,
+        "timeout_seconds": 30
+      },
+      "result_status": "TestResult.SUCCESS",
+      "records_retrieved": 300,
+      "variables_found": [
+        "Animal Occurrences",
+        "Plant Occurrences",
+        "Fungi Occurrences"
+      ],
+      "execution_time_seconds": 3.61,
+      "null_coordinates": 0,
+      "null_timestamps": 0,
+      "null_values": 0,
+      "duplicate_records": "156",
+      "sample_record": {
+        "observation_id": "gbif_1632777577",
+        "dataset": "GBIF_Enhanced",
+        "source_url": "https://api.gbif.org/v1",
+        "source_version": "v1.0",
+        "license": "https://creativecommons.org/licenses/by/4.0/",
+        "retrieval_timestamp": "2025-09-14T19:38:24.742493+00:00",
+        "geometry_type": "point",
+        "latitude": -33.88,
+        "longitude": 151.22,
+        "geom_wkt": "POINT(151.22 -33.88)",
+        "spatial_id": null,
+        "site_name": "Sydney | Sydney",
+        "admin": "Australia",
+        "elevation_m": null,
+        "time": "2025-01-24",
+        "temporal_coverage": "occurrence_date",
+        "variable": "Animal Occurrences",
+        "value": 1.0,
+        "unit": "count",
+        "depth_top_cm": null,
+        "depth_bottom_cm": null,
+        "qc_flag": "gbif_validated"
+      },
+      "value_ranges": {
+        "Animal Occurrences": {
+          "min": 1.0,
+          "max": 1.0,
+          "mean": 1.0
+        },
+        "Plant Occurrences": {
+          "min": 1.0,
+          "max": 1.0,
+          "mean": 1.0
+        },
+        "Fungi Occurrences": {
+          "min": 1.0,
+          "max": 1.0,
+          "mean": 1.0
+        }
+      },
+      "error_message": null,
+      "error_type": null,
+      "stack_trace": null,
+      "unique_locations": 0,
+      "temporal_coverage": {
+        "start": "2025-01-01T00:00:00",
+        "end": "2025-01-31T00:00:00",
+        "unique_timestamps": 11
+      },
+      "capabilities_summary": {
+        "total_variables": 8,
+        "enhancement_level": "earth_engine_gold_standard",
+        "requires_auth": false
+      }
+    },
+    {
+      "test_id": "overpass_san_francisco",
+      "service_name": "OverpassEnhanced",
+      "location_name": "San Francisco, CA",
+      "timestamp": "2025-09-14T12:38:25.762074",
+      "request_spec": {
+        "test_id": "overpass_san_francisco",
+        "service_name": "OverpassEnhanced",
+        "location_name": "San Francisco, CA",
+        "latitude": 37.7749,
+        "longitude": -122.4194,
+        "start_date": "2024-01-01",
+        "end_date": "2024-12-31",
+        "variables": [
+          "building",
+          "highway"
+        ],
+        "extra_params": {
+          "radius": 3000
+        },
+        "expected_records_min": 50,
+        "timeout_seconds": 30
+      },
+      "result_status": "TestResult.NO_DATA",
+      "records_retrieved": 0,
+      "variables_found": [],
+      "execution_time_seconds": 1.24,
+      "null_coordinates": 0,
+      "null_timestamps": 0,
+      "null_values": 0,
+      "duplicate_records": 0,
+      "sample_record": null,
+      "value_ranges": null,
+      "error_message": "Service returned empty result set",
+      "error_type": null,
+      "stack_trace": null,
+      "unique_locations": 0,
+      "temporal_coverage": null,
+      "capabilities_summary": {
+        "total_variables": 70,
+        "enhancement_level": "earth_engine_gold_standard",
+        "requires_auth": false
+      }
+    }
+  ],
+  "analysis_report": {
+    "executive_summary": {
+      "total_tests_executed": 11,
+      "overall_success_rate": 0.8181818181818182,
+      "total_records_retrieved": 6791,
+      "avg_data_quality_score": 0.7777777777777778,
+      "services_tested": 6,
+      "locations_tested": 11
+    },
+    "service_performance": {
+      "USGSNWISEnhanced": {
+        "tests_run": 2,
+        "success_count": 2,
+        "success_rate": 1.0,
+        "avg_records_per_success": 31.0,
+        "avg_execution_time": 3.9,
+        "common_errors": []
+      },
+      "GBIFEnhanced": {
+        "tests_run": 2,
+        "success_count": 2,
+        "success_rate": 1.0,
+        "avg_records_per_success": 300.0,
+        "avg_execution_time": 3.52,
+        "common_errors": []
+      },
+      "OverpassEnhanced": {
+        "tests_run": 1,
+        "success_count": 0,
+        "success_rate": 0.0,
+        "avg_records_per_success": 0,
+        "avg_execution_time": 1.24,
+        "common_errors": [
+          {
+            "error": "NO_DATA: Unknown",
+            "count": 1,
+            "example_message": "Service returned empty result set"
+          }
+        ]
+      },
+      "OpenAQEnhanced": {
+        "tests_run": 2,
+        "success_count": 1,
+        "success_rate": 0.5,
+        "avg_records_per_success": 6000.0,
+        "avg_execution_time": 14.42,
+        "common_errors": [
+          {
+            "error": "NO_DATA: Unknown",
+            "count": 1,
+            "example_message": "Service returned empty result set"
+          }
+        ]
+      },
+      "NASAPOWEREnhanced": {
+        "tests_run": 2,
+        "success_count": 2,
+        "success_rate": 1.0,
+        "avg_records_per_success": 62.0,
+        "avg_execution_time": 3.45,
+        "common_errors": []
+      },
+      "SoilGridsEnhanced": {
+        "tests_run": 2,
+        "success_count": 2,
+        "success_rate": 1.0,
+        "avg_records_per_success": 2.5,
+        "avg_execution_time": 5.73,
+        "common_errors": []
+      }
+    },
+    "data_quality_metrics": {
+      "avg_success_score": 0.7777777777777778,
+      "coordinate_completeness": 0.11647769106169936,
+      "timestamp_completeness": 0.9992637314092181,
+      "value_completeness": 1.0,
+      "duplicate_rate": 0.045943160064791634
+    },
+    "recommendations": [
+      "OverpassEnhanced: No successful tests - check imports and basic functionality",
+      "Coordinate extraction issues detected - review geometry handling in base adapters"
+    ],
+    "validated_test_matrix": {
+      "OpenAQEnhanced": [
+        {
+          "test_id": "openaq_los_angeles",
+          "location": "Los Angeles, CA",
+          "coordinates": [
+            -118.2437,
+            34.0522
+          ],
+          "time_period": [
+            "2024-08-01",
+            "2024-08-31"
+          ],
+          "variables": [
+            "pm25",
+            "pm10"
+          ],
+          "extra_params": {
+            "radius": 15000
+          },
+          "expected_records": 6000,
+          "quality_score": 0.6666666666666667
+        }
+      ],
+      "NASAPOWEREnhanced": [
+        {
+          "test_id": "nasa_power_global_1",
+          "location": "Chicago, IL",
+          "coordinates": [
+            -87.6298,
+            41.8781
+          ],
+          "time_period": [
+            "2024-08-01",
+            "2024-08-31"
+          ],
+          "variables": [
+            "T2M",
+            "PRECTOTCORR"
+          ],
+          "extra_params": {},
+          "expected_records": 62,
+          "quality_score": 1.0
+        },
+        {
+          "test_id": "nasa_power_global_2",
+          "location": "S\u00e3o Paulo, Brazil",
+          "coordinates": [
+            -46.6333,
+            -23.5505
+          ],
+          "time_period": [
+            "2024-01-01",
+            "2024-01-31"
+          ],
+          "variables": [
+            "T2M",
+            "RH2M"
+          ],
+          "extra_params": {},
+          "expected_records": 62,
+          "quality_score": 1.0
+        }
+      ],
+      "USGSNWISEnhanced": [
+        {
+          "test_id": "usgs_colorado_river",
+          "location": "Colorado River - Grand Canyon",
+          "coordinates": [
+            -112.1129,
+            36.1069
+          ],
+          "time_period": [
+            "2024-08-01",
+            "2024-08-31"
+          ],
+          "variables": [
+            "00060",
+            "00065"
+          ],
+          "extra_params": {
+            "radius": 50000
+          },
+          "expected_records": 31,
+          "quality_score": 1.0
+        },
+        {
+          "test_id": "usgs_mississippi",
+          "location": "Mississippi River - St. Louis",
+          "coordinates": [
+            -90.1994,
+            38.627
+          ],
+          "time_period": [
+            "2024-08-01",
+            "2024-08-31"
+          ],
+          "variables": [
+            "00060",
+            "00010"
+          ],
+          "extra_params": {
+            "radius": 25000
+          },
+          "expected_records": 31,
+          "quality_score": 1.0
+        }
+      ],
+      "SoilGridsEnhanced": [
+        {
+          "test_id": "soilgrids_iowa_agriculture",
+          "location": "Iowa Corn Belt",
+          "coordinates": [
+            -93.6319,
+            42.0308
+          ],
+          "time_period": [
+            "2024-01-01",
+            "2024-12-31"
+          ],
+          "variables": [
+            "clay",
+            "sand",
+            "phh2o"
+          ],
+          "extra_params": {
+            "depth": "0-5cm"
+          },
+          "expected_records": 3,
+          "quality_score": 0.6666666666666667
+        },
+        {
+          "test_id": "soilgrids_kenya_agriculture",
+          "location": "Kenya Highlands",
+          "coordinates": [
+            37.9062,
+            -0.0236
+          ],
+          "time_period": [
+            "2024-01-01",
+            "2024-12-31"
+          ],
+          "variables": [
+            "clay",
+            "silt"
+          ],
+          "extra_params": {
+            "depth": "0-30cm"
+          },
+          "expected_records": 2,
+          "quality_score": 0.6666666666666667
+        }
+      ],
+      "GBIFEnhanced": [
+        {
+          "test_id": "gbif_costa_rica_biodiversity",
+          "location": "Costa Rica - Monteverde",
+          "coordinates": [
+            -84.8015,
+            10.3009
+          ],
+          "time_period": [
+            "2024-01-01",
+            "2024-12-31"
+          ],
+          "variables": [
+            "occurrence"
+          ],
+          "extra_params": {
+            "radius": 10000,
+            "limit": 200
+          },
+          "expected_records": 300,
+          "quality_score": 0.5
+        },
+        {
+          "test_id": "gbif_yellowstone_biodiversity",
+          "location": "Yellowstone National Park",
+          "coordinates": [
+            -110.5885,
+            44.428
+          ],
+          "time_period": [
+            "2024-06-01",
+            "2024-08-31"
+          ],
+          "variables": [
+            "occurrence"
+          ],
+          "extra_params": {
+            "radius": 15000,
+            "limit": 300
+          },
+          "expected_records": 300,
+          "quality_score": 0.5
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,129 @@
+# Service-specific Configuration Parameters
+# Non-sensitive settings for each environmental service
+
+NASA_POWER:
+  base_url: "https://power.larc.nasa.gov/api/temporal/daily/point"
+  timeout: 30
+  rate_limit:
+    requests_per_hour: 3600
+  default_community: "RE"  # Renewable Energy
+  supported_variables:
+    - "T2M"          # Temperature at 2m
+    - "PRECTOTCORR"  # Precipitation 
+    - "ALLSKY_SFC_SW_DWN"  # Solar irradiance
+
+US_EIA:
+  base_url: "https://api.eia.gov/v2"
+  timeout: 30
+  rate_limit:
+    requests_per_hour: 5000
+    max_rows_per_request: 5000
+  retry_on_500: true
+  available_routes:
+    - "electricity/rto/region-data"
+    - "coal/consumption-and-quality"
+    - "natural-gas/pri/sum"
+
+EPA_AQS:
+  base_url: "https://aqs.epa.gov/data/api"
+  timeout: 30
+  rate_limit:
+    requests_per_hour: 1000
+    min_interval_seconds: 3.6
+  test_mode: false
+  bbox_method: true  # Use bounding box method for queries
+
+OpenAQ:
+  base_url: "https://api.openaq.org/v3"
+  timeout: 30
+  rate_limit:
+    requests_per_minute: 300
+  default_radius_m: 2000
+  max_sensors: 5
+  supported_parameters:
+    - "pm25"
+    - "pm10" 
+    - "o3"
+    - "no2"
+    - "so2"
+    - "co"
+
+SoilGrids:
+  base_url: "https://rest.isric.org"
+  wcs_url: "https://maps.isric.org/mapserv"
+  timeout: 60
+  rate_limit:
+    requests_per_minute: 300
+  default_depths:
+    - "0-5cm"
+    - "5-15cm"
+    - "15-30cm"
+  supported_properties:
+    - "clay"
+    - "sand"
+    - "silt"
+    - "phh2o"
+    - "ocd"
+
+GBIF:
+  base_url: "https://api.gbif.org/v1"
+  timeout: 30
+  rate_limit:
+    requests_per_minute: 300
+  max_results: 1000
+
+OSM_Overpass:
+  base_url: "https://overpass-api.de/api/interpreter"
+  timeout: 180
+  rate_limit:
+    requests_per_minute: 60
+  default_radius_m: 1000
+  query_timeout: 25
+
+USGS_NWIS:
+  base_url: "https://waterservices.usgs.gov/nwis/iv"
+  timeout: 30
+  supported_parameters:
+    - "00060"  # Discharge
+    - "00065"  # Gage height
+    - "00010"  # Temperature
+
+# Earth Engine configuration
+EARTH_ENGINE:
+  default_scale: 1000
+  max_pixels: 1000
+  max_features: 500
+  cache_ttl_hours: 24
+  featured_assets:
+    - asset_id: "LANDSAT/LC08/C02/T1_L2"
+      title: "Landsat 8 Surface Reflectance"
+      category: "satellite"
+      bands: ["SR_B1", "SR_B2", "SR_B3", "SR_B4", "SR_B5", "SR_B6", "SR_B7"]
+    - asset_id: "COPERNICUS/S2_SR_HARMONIZED" 
+      title: "Sentinel-2 Surface Reflectance"
+      category: "satellite"
+      bands: ["B1", "B2", "B3", "B4", "B5", "B6", "B7", "B8", "B8A", "B9", "B10", "B11", "B12"]
+    - asset_id: "MODIS/006/MOD17A2H"
+      title: "MODIS Gross Primary Productivity"
+      category: "vegetation"
+      bands: ["Gpp", "PsnNet"]
+    - asset_id: "MODIS/006/MOD13A1"
+      title: "MODIS Vegetation Indices"
+      category: "vegetation" 
+      bands: ["NDVI", "EVI"]
+    - asset_id: "ECMWF/ERA5_LAND/DAILY_AGGR"
+      title: "ERA5-Land Daily Aggregates"
+      category: "climate"
+      bands: ["temperature_2m", "dewpoint_temperature_2m", "u_component_of_wind_10m", "v_component_of_wind_10m"]
+    - asset_id: "NASA/NASADEM_HGT/001"
+      title: "NASADEM Elevation"
+      category: "topography"
+      bands: ["elevation"]
+  asset_categories:
+    climate: ["ECMWF", "ERA5", "GLDAS"]
+    satellite: ["LANDSAT", "COPERNICUS", "SENTINEL"]
+    vegetation: ["MODIS", "MOD13", "MOD17"]
+    topography: ["NASADEM", "SRTM", "ASTER"]
+    water: ["JRC", "GLCF"]
+  discovery:
+    max_assets_per_category: 50

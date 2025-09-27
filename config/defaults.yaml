@@ -1,0 +1,56 @@
+# Default Configuration Values
+# Framework-wide defaults and fallback settings
+
+# Metadata management
+metadata:
+  refresh_interval_hours: 24
+  cache_ttl_hours: 6
+  auto_refresh: true
+  max_cache_size_mb: 500
+
+# Service defaults
+services:
+  default_timeout: 30
+  default_retries: 2
+  user_agent: "env-agents/1.0"
+  
+# Earth Engine defaults  
+earth_engine:
+  default_scale: 1000
+  max_pixels: 1000
+  max_features: 500
+  cache_ttl_hours: 24
+  
+# Logging
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  
+# Data paths (relative to base_dir)
+data_paths:
+  metadata: "data/metadata"
+  cache: "data/cache" 
+  auth: "data/auth"
+  
+# Framework settings
+framework:
+  version: "1.0.0"
+  api_version: "v1"
+  max_concurrent_requests: 5
+  
+# Query defaults
+query_defaults:
+  max_observations: 10000
+  timeout: 60
+  include_metadata: true
+  include_provenance: true
+  
+# Export formats
+export:
+  supported_formats:
+    - "pandas"
+    - "geojson" 
+    - "csv"
+    - "parquet"
+    - "stac"
+  default_format: "pandas"

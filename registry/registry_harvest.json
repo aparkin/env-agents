@@ -1,0 +1,796 @@
+{
+  "NASA_POWER": {
+    "dataset": "NASA_POWER",
+    "fetched_at": "2025-09-10T14:04:10.798275+00:00",
+    "variables": [
+      {
+        "canonical": "atm:t2m",
+        "platform": "T2M",
+        "unit": "C",
+        "description": "Temperature at 2 Meters"
+      },
+      {
+        "canonical": "atm:precip",
+        "platform": "PRECTOTCORR",
+        "unit": "mm",
+        "description": "Precipitation Corrected"
+      },
+      {
+        "canonical": "atm:allsky_sfc_sw_dwn",
+        "platform": "ALLSKY_SFC_SW_DWN",
+        "unit": "MJ/m^2/day",
+        "description": "All Sky Surface Shortwave Downward Irradiance"
+      }
+    ],
+    "attributes_schema": {
+      "nasapower_parameter": {
+        "type": "string"
+      },
+      "community": {
+        "type": "string"
+      },
+      "meta": {
+        "type": "object"
+      }
+    },
+    "rate_limits": {
+      "notes": "Public API; backoff on 5xx."
+    },
+    "notes": "Live discovery from POWER parameter dictionary (community=RE)."
+  },
+  "US_EIA": {
+    "dataset": "US_EIA",
+    "error": "EIAAdapter.capabilities() takes 1 positional argument but 2 were given"
+  },
+  "EPA_AQS": {
+    "dataset": "EPA_AQS",
+    "error": "EPAAQSAdapter.capabilities() takes 1 positional argument but 2 were given"
+  },
+  "SoilGrids": {
+    "dataset": "SoilGrids",
+    "fetched_at": "2025-09-10T14:04:10.798422+00:00",
+    "variables": [
+      {
+        "canonical": "soil:clay_content_percent",
+        "platform": "clay",
+        "unit": "%",
+        "description": "Clay content (0-2 \u03bcm)",
+        "domain": "soil"
+      },
+      {
+        "canonical": "soil:silt_content_percent",
+        "platform": "silt",
+        "unit": "%",
+        "description": "Silt content (2-50 \u03bcm)",
+        "domain": "soil"
+      },
+      {
+        "canonical": "soil:sand_content_percent",
+        "platform": "sand",
+        "unit": "%",
+        "description": "Sand content (50-2000 \u03bcm)",
+        "domain": "soil"
+      },
+      {
+        "canonical": "soil:bulk_density_cg_cm3",
+        "platform": "bdod",
+        "unit": "cg/cm\u00b3",
+        "description": "Bulk density of fine earth",
+        "domain": "soil"
+      },
+      {
+        "canonical": "soil:ph_h2o",
+        "platform": "phh2o",
+        "unit": "pH",
+        "description": "pH in water solution",
+        "domain": "soil"
+      },
+      {
+        "canonical": "soil:cation_exchange_capacity_mmol_kg",
+        "platform": "cec",
+        "unit": "mmol(c)/kg",
+        "description": "Cation exchange capacity",
+        "domain": "soil"
+      },
+      {
+        "canonical": "soil:soil_organic_carbon_dg_kg",
+        "platform": "soc",
+        "unit": "dg/kg",
+        "description": "Soil organic carbon content",
+        "domain": "soil"
+      },
+      {
+        "canonical": "soil:total_nitrogen_cg_kg",
+        "platform": "nitrogen",
+        "unit": "cg/kg",
+        "description": "Total nitrogen content",
+        "domain": "soil"
+      },
+      {
+        "canonical": "soil:volumetric_water_10kpa",
+        "platform": "wv0010",
+        "unit": "vol%",
+        "description": "Volumetric water content at 10 kPa",
+        "domain": "soil"
+      },
+      {
+        "canonical": "soil:volumetric_water_33kpa",
+        "platform": "wv0033",
+        "unit": "vol%",
+        "description": "Volumetric water content at 33 kPa (field capacity)",
+        "domain": "soil"
+      },
+      {
+        "canonical": "soil:volumetric_water_1500kpa",
+        "platform": "wv1500",
+        "unit": "vol%",
+        "description": "Volumetric water content at 1500 kPa (wilting point)",
+        "domain": "soil"
+      },
+      {
+        "canonical": "soil:organic_carbon_density_hg_m3",
+        "platform": "ocd",
+        "unit": "hg/m\u00b3",
+        "description": "Organic carbon density",
+        "domain": "soil"
+      },
+      {
+        "canonical": "soil:organic_carbon_stock_t_ha",
+        "platform": "ocs",
+        "unit": "t/ha",
+        "description": "Organic carbon stock",
+        "domain": "soil"
+      }
+    ],
+    "attributes_schema": {
+      "depth_interval": {
+        "type": "string",
+        "description": "Depth interval (e.g. 0-5cm)"
+      },
+      "uncertainty": {
+        "type": "number",
+        "description": "Prediction uncertainty"
+      },
+      "soilgrids_property": {
+        "type": "string",
+        "description": "Native SoilGrids property name"
+      },
+      "prediction_method": {
+        "type": "string",
+        "description": "Statistical method used"
+      }
+    },
+    "rate_limits": {
+      "notes": "Public API with reasonable use policy"
+    },
+    "notes": "Global gridded soil information at 250m resolution"
+  },
+  "GBIF": {
+    "dataset": "GBIF",
+    "fetched_at": "2025-09-10T14:04:10.799660+00:00",
+    "variables": [
+      {
+        "canonical": "biodiversity:incertae_sedis:occurrence_count",
+        "platform": "occurrenceSearch?kingdom=INCERTAE_SEDIS",
+        "unit": "count",
+        "description": "INCERTAE_SEDIS occurrence records",
+        "domain": "biodiversity"
+      },
+      {
+        "canonical": "biodiversity:animalia:occurrence_count",
+        "platform": "occurrenceSearch?kingdom=ANIMALIA",
+        "unit": "count",
+        "description": "ANIMALIA occurrence records",
+        "domain": "biodiversity"
+      },
+      {
+        "canonical": "biodiversity:archaea:occurrence_count",
+        "platform": "occurrenceSearch?kingdom=ARCHAEA",
+        "unit": "count",
+        "description": "ARCHAEA occurrence records",
+        "domain": "biodiversity"
+      },
+      {
+        "canonical": "biodiversity:bacteria:occurrence_count",
+        "platform": "occurrenceSearch?kingdom=BACTERIA",
+        "unit": "count",
+        "description": "BACTERIA occurrence records",
+        "domain": "biodiversity"
+      },
+      {
+        "canonical": "biodiversity:chromista:occurrence_count",
+        "platform": "occurrenceSearch?kingdom=CHROMISTA",
+        "unit": "count",
+        "description": "CHROMISTA occurrence records",
+        "domain": "biodiversity"
+      },
+      {
+        "canonical": "biodiversity:fungi:occurrence_count",
+        "platform": "occurrenceSearch?kingdom=FUNGI",
+        "unit": "count",
+        "description": "FUNGI occurrence records",
+        "domain": "biodiversity"
+      }
+    ],
+    "attributes_schema": {
+      "species_key": {
+        "type": "integer",
+        "description": "GBIF species key"
+      },
+      "taxon_key": {
+        "type": "integer",
+        "description": "GBIF taxon key"
+      },
+      "kingdom": {
+        "type": "string",
+        "description": "Taxonomic kingdom"
+      },
+      "scientific_name": {
+        "type": "string",
+        "description": "Scientific name"
+      },
+      "basis_of_record": {
+        "type": "string",
+        "description": "Type of record"
+      },
+      "coordinate_uncertainty": {
+        "type": "number",
+        "description": "Location uncertainty (m)"
+      },
+      "elevation": {
+        "type": "number",
+        "description": "Elevation (m)"
+      },
+      "depth": {
+        "type": "number",
+        "description": "Depth (m)"
+      }
+    },
+    "rate_limits": {
+      "requests_per_minute": 300,
+      "notes": "Public API with reasonable use policy"
+    },
+    "notes": "Global biodiversity occurrence data from museums, herbaria, observations"
+  },
+  "OpenAQ": {
+    "dataset": "OpenAQ",
+    "fetched_at": "2025-09-10T14:04:10.800888+00:00",
+    "variables": [
+      {
+        "canonical": "air:pm10",
+        "platform": "pm10",
+        "unit": "\u00b5g/m\u00b3",
+        "description": "PM10"
+      },
+      {
+        "canonical": "air:pm25",
+        "platform": "pm25",
+        "unit": "\u00b5g/m\u00b3",
+        "description": "PM2.5"
+      },
+      {
+        "canonical": "air:o3",
+        "platform": "o3",
+        "unit": "\u00b5g/m\u00b3",
+        "description": "O\u2083 mass"
+      },
+      {
+        "canonical": "air:co",
+        "platform": "co",
+        "unit": "\u00b5g/m\u00b3",
+        "description": "CO mass"
+      },
+      {
+        "canonical": "air:no2",
+        "platform": "no2",
+        "unit": "\u00b5g/m\u00b3",
+        "description": "NO\u2082 mass"
+      },
+      {
+        "canonical": "air:so2",
+        "platform": "so2",
+        "unit": "\u00b5g/m\u00b3",
+        "description": "SO\u2082 mass"
+      },
+      {
+        "canonical": "air:no2",
+        "platform": "no2",
+        "unit": "ppm",
+        "description": "NO\u2082"
+      },
+      {
+        "canonical": "air:co",
+        "platform": "co",
+        "unit": "ppm",
+        "description": "CO"
+      },
+      {
+        "canonical": "air:so2",
+        "platform": "so2",
+        "unit": "ppm",
+        "description": "SO\u2082"
+      },
+      {
+        "canonical": "air:o3",
+        "platform": "o3",
+        "unit": "ppm",
+        "description": "O\u2083"
+      },
+      {
+        "canonical": "air:bc",
+        "platform": "bc",
+        "unit": "\u00b5g/m\u00b3",
+        "description": "BC"
+      },
+      {
+        "canonical": "air:no2",
+        "platform": "no2",
+        "unit": "ppb",
+        "description": "NO\u2082"
+      },
+      {
+        "canonical": "air:pm1",
+        "platform": "pm1",
+        "unit": "\u00b5g/m\u00b3",
+        "description": "PM1"
+      },
+      {
+        "canonical": "air:co2",
+        "platform": "co2",
+        "unit": "ppm",
+        "description": "CO\u2082"
+      },
+      {
+        "canonical": "air:wind_direction",
+        "platform": "wind_direction",
+        "unit": "deg",
+        "description": "Wind direction"
+      },
+      {
+        "canonical": "air:nox",
+        "platform": "nox",
+        "unit": "ppb",
+        "description": "NOX"
+      },
+      {
+        "canonical": "air:no",
+        "platform": "no",
+        "unit": "ppb",
+        "description": "NO"
+      },
+      {
+        "canonical": "air:nox",
+        "platform": "nox",
+        "unit": "\u00b5g/m\u00b3",
+        "description": "NOx mass"
+      },
+      {
+        "canonical": "air:ch4",
+        "platform": "ch4",
+        "unit": "ppm",
+        "description": "CH\u2084"
+      },
+      {
+        "canonical": "air:o3",
+        "platform": "o3",
+        "unit": "ppb",
+        "description": "O\u2083"
+      },
+      {
+        "canonical": "air:ufp",
+        "platform": "ufp",
+        "unit": "particles/cm\u00b3",
+        "description": "UFP count"
+      },
+      {
+        "canonical": "air:wind_speed",
+        "platform": "wind_speed",
+        "unit": "m/s",
+        "description": "Wind speed"
+      },
+      {
+        "canonical": "air:no",
+        "platform": "no",
+        "unit": "ppm",
+        "description": "NO"
+      },
+      {
+        "canonical": "air:pressure",
+        "platform": "pressure",
+        "unit": "hpa",
+        "description": "Atmospheric pressure"
+      },
+      {
+        "canonical": "air:pm25-old",
+        "platform": "pm25-old",
+        "unit": "ugm3",
+        "description": "pm25-old"
+      },
+      {
+        "canonical": "air:relativehumidity",
+        "platform": "relativehumidity",
+        "unit": "%",
+        "description": "RH"
+      },
+      {
+        "canonical": "air:temperature",
+        "platform": "temperature",
+        "unit": "c",
+        "description": "Temperature (C)"
+      },
+      {
+        "canonical": "air:so2",
+        "platform": "so2",
+        "unit": "ppb",
+        "description": "SO\u2082"
+      },
+      {
+        "canonical": "air:co",
+        "platform": "co",
+        "unit": "ppb",
+        "description": "CO"
+      },
+      {
+        "canonical": "air:um003",
+        "platform": "um003",
+        "unit": "particles/cm\u00b3",
+        "description": "PM0.3 count"
+      },
+      {
+        "canonical": "air:um010",
+        "platform": "um010",
+        "unit": "particles/cm\u00b3",
+        "description": "PM1 count"
+      },
+      {
+        "canonical": "air:temperature",
+        "platform": "temperature",
+        "unit": "f",
+        "description": "Temperature (F)"
+      },
+      {
+        "canonical": "air:um025",
+        "platform": "um025",
+        "unit": "particles/cm\u00b3",
+        "description": "PM2.5 count"
+      },
+      {
+        "canonical": "air:pressure",
+        "platform": "pressure",
+        "unit": "mb",
+        "description": "Pressure"
+      },
+      {
+        "canonical": "air:humidity",
+        "platform": "humidity",
+        "unit": "%",
+        "description": "H"
+      },
+      {
+        "canonical": "air:um100",
+        "platform": "um100",
+        "unit": "particles/cm\u00b3",
+        "description": "PM10 count"
+      },
+      {
+        "canonical": "air:nox",
+        "platform": "nox",
+        "unit": "ppm",
+        "description": "NOx"
+      },
+      {
+        "canonical": "air:no",
+        "platform": "no",
+        "unit": "\u00b5g/m\u00b3",
+        "description": "NO mass"
+      },
+      {
+        "canonical": "air:pm4",
+        "platform": "pm4",
+        "unit": "\u00b5g/m\u00b3",
+        "description": "PM4.0"
+      },
+      {
+        "canonical": "air:pm25",
+        "platform": "pm25",
+        "unit": "ppm",
+        "description": "pm25"
+      }
+    ],
+    "attributes_schema": {
+      "method": {
+        "type": "string"
+      },
+      "sourceName": {
+        "type": "string"
+      },
+      "city": {
+        "type": "string"
+      },
+      "aggregation": {
+        "type": "string"
+      },
+      "interval": {
+        "type": "string"
+      }
+    },
+    "rate_limits": {
+      "notes": "Backoff on 429/5xx; moderate pagination."
+    },
+    "notes": "Live discovery from /v3/parameters."
+  },
+  "OSM_Overpass": {
+    "dataset": "OSM_Overpass",
+    "fetched_at": "2025-09-10T14:04:10.801048+00:00",
+    "variables": [
+      {
+        "canonical": "osm:amenity:restaurant",
+        "platform": "amenity=restaurant",
+        "unit": "count",
+        "description": "Restaurant features from OpenStreetMap",
+        "domain": "geographic_features"
+      },
+      {
+        "canonical": "osm:amenity:cafe",
+        "platform": "amenity=cafe",
+        "unit": "count",
+        "description": "Cafe features from OpenStreetMap",
+        "domain": "geographic_features"
+      },
+      {
+        "canonical": "osm:amenity:hospital",
+        "platform": "amenity=hospital",
+        "unit": "count",
+        "description": "Hospital features from OpenStreetMap",
+        "domain": "geographic_features"
+      },
+      {
+        "canonical": "osm:amenity:school",
+        "platform": "amenity=school",
+        "unit": "count",
+        "description": "School features from OpenStreetMap",
+        "domain": "geographic_features"
+      },
+      {
+        "canonical": "osm:amenity:bank",
+        "platform": "amenity=bank",
+        "unit": "count",
+        "description": "Bank features from OpenStreetMap",
+        "domain": "geographic_features"
+      },
+      {
+        "canonical": "osm:amenity:pharmacy",
+        "platform": "amenity=pharmacy",
+        "unit": "count",
+        "description": "Pharmacy features from OpenStreetMap",
+        "domain": "geographic_features"
+      },
+      {
+        "canonical": "osm:amenity:fuel",
+        "platform": "amenity=fuel",
+        "unit": "count",
+        "description": "Fuel features from OpenStreetMap",
+        "domain": "geographic_features"
+      },
+      {
+        "canonical": "osm:shop:supermarket",
+        "platform": "shop=supermarket",
+        "unit": "count",
+        "description": "Supermarket features from OpenStreetMap",
+        "domain": "geographic_features"
+      },
+      {
+        "canonical": "osm:shop:convenience",
+        "platform": "shop=convenience",
+        "unit": "count",
+        "description": "Convenience features from OpenStreetMap",
+        "domain": "geographic_features"
+      },
+      {
+        "canonical": "osm:shop:bakery",
+        "platform": "shop=bakery",
+        "unit": "count",
+        "description": "Bakery features from OpenStreetMap",
+        "domain": "geographic_features"
+      },
+      {
+        "canonical": "osm:shop:clothes",
+        "platform": "shop=clothes",
+        "unit": "count",
+        "description": "Clothes features from OpenStreetMap",
+        "domain": "geographic_features"
+      },
+      {
+        "canonical": "osm:shop:electronics",
+        "platform": "shop=electronics",
+        "unit": "count",
+        "description": "Electronics features from OpenStreetMap",
+        "domain": "geographic_features"
+      },
+      {
+        "canonical": "osm:tourism:hotel",
+        "platform": "tourism=hotel",
+        "unit": "count",
+        "description": "Hotel features from OpenStreetMap",
+        "domain": "geographic_features"
+      },
+      {
+        "canonical": "osm:tourism:museum",
+        "platform": "tourism=museum",
+        "unit": "count",
+        "description": "Museum features from OpenStreetMap",
+        "domain": "geographic_features"
+      },
+      {
+        "canonical": "osm:tourism:attraction",
+        "platform": "tourism=attraction",
+        "unit": "count",
+        "description": "Attraction features from OpenStreetMap",
+        "domain": "geographic_features"
+      },
+      {
+        "canonical": "osm:tourism:information",
+        "platform": "tourism=information",
+        "unit": "count",
+        "description": "Information features from OpenStreetMap",
+        "domain": "geographic_features"
+      },
+      {
+        "canonical": "osm:leisure:park",
+        "platform": "leisure=park",
+        "unit": "count",
+        "description": "Park features from OpenStreetMap",
+        "domain": "geographic_features"
+      },
+      {
+        "canonical": "osm:leisure:playground",
+        "platform": "leisure=playground",
+        "unit": "count",
+        "description": "Playground features from OpenStreetMap",
+        "domain": "geographic_features"
+      },
+      {
+        "canonical": "osm:leisure:sports_centre",
+        "platform": "leisure=sports_centre",
+        "unit": "count",
+        "description": "Sports Centre features from OpenStreetMap",
+        "domain": "geographic_features"
+      },
+      {
+        "canonical": "osm:leisure:swimming_pool",
+        "platform": "leisure=swimming_pool",
+        "unit": "count",
+        "description": "Swimming Pool features from OpenStreetMap",
+        "domain": "geographic_features"
+      },
+      {
+        "canonical": "osm:natural:tree",
+        "platform": "natural=tree",
+        "unit": "count",
+        "description": "Tree features from OpenStreetMap",
+        "domain": "geographic_features"
+      },
+      {
+        "canonical": "osm:natural:water",
+        "platform": "natural=water",
+        "unit": "count",
+        "description": "Water features from OpenStreetMap",
+        "domain": "geographic_features"
+      },
+      {
+        "canonical": "osm:natural:beach",
+        "platform": "natural=beach",
+        "unit": "count",
+        "description": "Beach features from OpenStreetMap",
+        "domain": "geographic_features"
+      },
+      {
+        "canonical": "osm:natural:forest",
+        "platform": "natural=forest",
+        "unit": "count",
+        "description": "Forest features from OpenStreetMap",
+        "domain": "geographic_features"
+      },
+      {
+        "canonical": "osm:landuse:residential",
+        "platform": "landuse=residential",
+        "unit": "count",
+        "description": "Residential features from OpenStreetMap",
+        "domain": "geographic_features"
+      },
+      {
+        "canonical": "osm:landuse:commercial",
+        "platform": "landuse=commercial",
+        "unit": "count",
+        "description": "Commercial features from OpenStreetMap",
+        "domain": "geographic_features"
+      },
+      {
+        "canonical": "osm:landuse:industrial",
+        "platform": "landuse=industrial",
+        "unit": "count",
+        "description": "Industrial features from OpenStreetMap",
+        "domain": "geographic_features"
+      },
+      {
+        "canonical": "osm:landuse:forest",
+        "platform": "landuse=forest",
+        "unit": "count",
+        "description": "Forest features from OpenStreetMap",
+        "domain": "geographic_features"
+      },
+      {
+        "canonical": "osm:landuse:farmland",
+        "platform": "landuse=farmland",
+        "unit": "count",
+        "description": "Farmland features from OpenStreetMap",
+        "domain": "geographic_features"
+      }
+    ],
+    "attributes_schema": {
+      "osm_type": {
+        "type": "string",
+        "description": "OSM element type (node/way/relation)"
+      },
+      "osm_id": {
+        "type": "integer",
+        "description": "OSM element ID"
+      },
+      "tags": {
+        "type": "object",
+        "description": "All OSM tags for the element"
+      },
+      "version": {
+        "type": "integer",
+        "description": "OSM element version"
+      },
+      "changeset": {
+        "type": "integer",
+        "description": "OSM changeset ID"
+      },
+      "user": {
+        "type": "string",
+        "description": "Last editor username"
+      },
+      "timestamp": {
+        "type": "string",
+        "description": "Last modification timestamp"
+      }
+    },
+    "rate_limits": {
+      "requests_per_minute": 60,
+      "timeout_seconds": 180,
+      "notes": "Fair use policy - avoid heavy queries during peak hours"
+    },
+    "notes": "OpenStreetMap geographic features via Overpass API"
+  },
+  "USGS_NWIS": {
+    "dataset": "USGS_NWIS",
+    "fetched_at": "2025-09-10T14:04:11.335711+00:00",
+    "variables": [
+      {
+        "canonical": "water:discharge_cfs",
+        "platform": "00060",
+        "unit": "ft3/s",
+        "description": "Discharge"
+      },
+      {
+        "canonical": "water:gage_height_ft",
+        "platform": "00065",
+        "unit": "ft",
+        "description": "Gage height"
+      },
+      {
+        "canonical": "water:water_temp_c",
+        "platform": "00010",
+        "unit": "degC",
+        "description": "Water temperature"
+      }
+    ],
+    "attributes_schema": {},
+    "rate_limits": {
+      "notes": "Public; backoff on 5xx"
+    },
+    "notes": "Harvest failed (404 Client Error:  for url: https://waterservices.usgs.gov/nwis/pmcodes?format=rdb&group_cd=PHY); using fallback CODEMAP. statCd per DV docs; IV has no statCd."
+  }
+}

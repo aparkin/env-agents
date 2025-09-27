@@ -1,0 +1,205 @@
+{
+  "metadata_version": "1.0.0",
+  "generated_at": "2025-09-09T08:06:12.379162",
+  "total_services": 6,
+  "services": {
+    "GEE/LANDSAT_LC08_C02_T1_L2": {
+      "service_id": "GEE/LANDSAT_LC08_C02_T1_L2",
+      "service_type": "earth_engine",
+      "title": "Landsat 8 Surface Reflectance",
+      "description": "This dataset contains atmospherically corrected\nsurface reflectance and land surface temperature derived from the data\nproduced by the Landsat 8 OLI/TIRS sensors.\nThese images contain 5 visible and ne...",
+      "provider": "Unknown",
+      "license": "Unknown",
+      "last_updated": "2025-09-09T08:06:12.379595",
+      "status": "unknown",
+      "variables": [],
+      "temporal_coverage": {
+        "start_date": null,
+        "end_date": null,
+        "cadence": null,
+        "resolution": null,
+        "is_ongoing": true
+      },
+      "spatial_coverage": {
+        "bbox": null,
+        "geometry": null,
+        "crs": null,
+        "resolution_m": null,
+        "coverage_type": "global"
+      },
+      "capabilities": {},
+      "attributes": {
+        "asset_id": "LANDSAT/LC08/C02/T1_L2",
+        "asset_type": null,
+        "tags": [],
+        "bands": [],
+        "ee_available": false
+      }
+    },
+    "GEE/COPERNICUS_S2_SR_HARMONIZED": {
+      "service_id": "GEE/COPERNICUS_S2_SR_HARMONIZED",
+      "service_type": "earth_engine",
+      "title": "Sentinel-2 Surface Reflectance",
+      "description": "After 2022-01-25, Sentinel-2 scenes with PROCESSING_BASELINE '04.00' or above\nhave their DN (value) range shifted by 1000. The HARMONIZED collection\nshifts data in newer scenes to be in the same range...",
+      "provider": "Unknown",
+      "license": "Unknown",
+      "last_updated": "2025-09-09T08:06:12.379602",
+      "status": "unknown",
+      "variables": [],
+      "temporal_coverage": {
+        "start_date": null,
+        "end_date": null,
+        "cadence": null,
+        "resolution": null,
+        "is_ongoing": true
+      },
+      "spatial_coverage": {
+        "bbox": null,
+        "geometry": null,
+        "crs": null,
+        "resolution_m": null,
+        "coverage_type": "global"
+      },
+      "capabilities": {},
+      "attributes": {
+        "asset_id": "COPERNICUS/S2_SR_HARMONIZED",
+        "asset_type": null,
+        "tags": [],
+        "bands": [],
+        "ee_available": false
+      }
+    },
+    "GEE/MODIS_006_MOD17A2H": {
+      "service_id": "GEE/MODIS_006_MOD17A2H",
+      "service_type": "earth_engine",
+      "title": "MODIS Gross Primary Productivity",
+      "description": "The MOD17A2H V6 Gross Primary Productivity (GPP) product\nis a cumulative 8-day composite with a 500m pixel size. The product\nis based on the radiation-use efficiency concept and can be potentially\nuse...",
+      "provider": "Unknown",
+      "license": "Unknown",
+      "last_updated": "2025-09-09T08:06:12.379606",
+      "status": "unknown",
+      "variables": [],
+      "temporal_coverage": {
+        "start_date": null,
+        "end_date": null,
+        "cadence": null,
+        "resolution": null,
+        "is_ongoing": true
+      },
+      "spatial_coverage": {
+        "bbox": null,
+        "geometry": null,
+        "crs": null,
+        "resolution_m": null,
+        "coverage_type": "global"
+      },
+      "capabilities": {},
+      "attributes": {
+        "asset_id": "MODIS/006/MOD17A2H",
+        "asset_type": null,
+        "tags": [],
+        "bands": [],
+        "ee_available": false
+      }
+    },
+    "GEE/MODIS_006_MOD13A1": {
+      "service_id": "GEE/MODIS_006_MOD13A1",
+      "service_type": "earth_engine",
+      "title": "MODIS Vegetation Indices",
+      "description": "The MOD13A1 V6 product provides a Vegetation Index (VI)\nvalue at a per pixel basis. There are two primary vegetation layers.\nThe first is the Normalized Difference Vegetation Index (NDVI)\nwhich is ref...",
+      "provider": "Unknown",
+      "license": "Unknown",
+      "last_updated": "2025-09-09T08:06:12.379609",
+      "status": "unknown",
+      "variables": [],
+      "temporal_coverage": {
+        "start_date": null,
+        "end_date": null,
+        "cadence": null,
+        "resolution": null,
+        "is_ongoing": true
+      },
+      "spatial_coverage": {
+        "bbox": null,
+        "geometry": null,
+        "crs": null,
+        "resolution_m": null,
+        "coverage_type": "global"
+      },
+      "capabilities": {},
+      "attributes": {
+        "asset_id": "MODIS/006/MOD13A1",
+        "asset_type": null,
+        "tags": [],
+        "bands": [],
+        "ee_available": false
+      }
+    },
+    "GEE/ECMWF_ERA5_LAND_DAILY_AGGR": {
+      "service_id": "GEE/ECMWF_ERA5_LAND_DAILY_AGGR",
+      "service_type": "earth_engine",
+      "title": "ERA5-Land Daily Aggregates",
+      "description": "ERA5-Land is a reanalysis dataset providing a consistent view of the\nevolution of land variables over several decades at an enhanced resolution\ncompared to ERA5. ERA5-Land has been produced by replayi...",
+      "provider": "Unknown",
+      "license": "Unknown",
+      "last_updated": "2025-09-09T08:06:12.379611",
+      "status": "unknown",
+      "variables": [],
+      "temporal_coverage": {
+        "start_date": null,
+        "end_date": null,
+        "cadence": null,
+        "resolution": null,
+        "is_ongoing": true
+      },
+      "spatial_coverage": {
+        "bbox": null,
+        "geometry": null,
+        "crs": null,
+        "resolution_m": null,
+        "coverage_type": "global"
+      },
+      "capabilities": {},
+      "attributes": {
+        "asset_id": "ECMWF/ERA5_LAND/DAILY_AGGR",
+        "asset_type": null,
+        "tags": [],
+        "bands": [],
+        "ee_available": false
+      }
+    },
+    "GEE/NASA_NASADEM_HGT_001": {
+      "service_id": "GEE/NASA_NASADEM_HGT_001",
+      "service_type": "earth_engine",
+      "title": "NASADEM Elevation",
+      "description": "NASADEM is a reprocessing of SRTM data, with improved accuracy by incorporating auxiliary data\nfrom ASTER GDEM, ICESat GLAS, and PRISM datasets.\n\nThe most significant processing improvements involve v...",
+      "provider": "Unknown",
+      "license": "Unknown",
+      "last_updated": "2025-09-09T08:06:12.379613",
+      "status": "unknown",
+      "variables": [],
+      "temporal_coverage": {
+        "start_date": null,
+        "end_date": null,
+        "cadence": null,
+        "resolution": null,
+        "is_ongoing": true
+      },
+      "spatial_coverage": {
+        "bbox": null,
+        "geometry": null,
+        "crs": null,
+        "resolution_m": null,
+        "coverage_type": "global"
+      },
+      "capabilities": {},
+      "attributes": {
+        "asset_id": "NASA/NASADEM_HGT/001",
+        "asset_type": null,
+        "tags": [],
+        "bands": [],
+        "ee_available": false
+      }
+    }
+  }
+}

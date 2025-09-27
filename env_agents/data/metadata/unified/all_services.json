@@ -1,0 +1,55 @@
+{
+  "last_updated": "2025-09-09T08:05:33.154145",
+  "env_agents_services": [],
+  "earth_engine_assets": [
+    {
+      "service_id": "GEE/LANDSAT_LC08_C02_T1_L2",
+      "type": "earth_engine",
+      "asset_id": "LANDSAT/LC08/C02/T1_L2",
+      "title": "Landsat 8 Surface Reflectance",
+      "category": "satellite",
+      "status": "active"
+    },
+    {
+      "service_id": "GEE/COPERNICUS_S2_SR_HARMONIZED",
+      "type": "earth_engine",
+      "asset_id": "COPERNICUS/S2_SR_HARMONIZED",
+      "title": "Sentinel-2 Surface Reflectance",
+      "category": "satellite",
+      "status": "active"
+    },
+    {
+      "service_id": "GEE/MODIS_006_MOD17A2H",
+      "type": "earth_engine",
+      "asset_id": "MODIS/006/MOD17A2H",
+      "title": "MODIS Gross Primary Productivity",
+      "category": "vegetation",
+      "status": "active"
+    },
+    {
+      "service_id": "GEE/MODIS_006_MOD13A1",
+      "type": "earth_engine",
+      "asset_id": "MODIS/006/MOD13A1",
+      "title": "MODIS Vegetation Indices",
+      "category": "vegetation",
+      "status": "active"
+    },
+    {
+      "service_id": "GEE/ECMWF_ERA5_LAND_DAILY_AGGR",
+      "type": "earth_engine",
+      "asset_id": "ECMWF/ERA5_LAND/DAILY_AGGR",
+      "title": "ERA5-Land Daily Aggregates",
+      "category": "climate",
+      "status": "active"
+    },
+    {
+      "service_id": "GEE/NASA_NASADEM_HGT_001",
+      "type": "earth_engine",
+      "asset_id": "NASA/NASADEM_HGT/001",
+      "title": "NASADEM Elevation",
+      "category": "terrain",
+      "status": "active"
+    }
+  ],
+  "total_services": 6
+}

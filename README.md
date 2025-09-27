@@ -110,20 +110,15 @@ Variables: 190 environmental parameters
 ## 📚 Documentation
 
 ### Core Documentation
-- **[Getting Started](docs/GETTING_STARTED.md)** - Installation and basic usage
-- **[Architecture](docs/ARCHITECTURE_COMPREHENSIVE.md)** - System design and components
-- **[Services Guide](docs/CANONICAL_SERVICES.md)** - Supported data sources
-- **[API Reference](docs/API_REFERENCE.md)** - Detailed API documentation
-
-### Extension and Development
-- **[Adding New Services](docs/EXTENDING_SERVICES.md)** - How to add new adapters
-- **[Development Guide](docs/DEVELOPMENT.md)** - Contributing to env-agents
-- **[NOAA Example](docs/NOAA_ADAPTER_EXAMPLE.md)** - Complete example adapter
+- **[API Reference](docs/API_REFERENCE.md)** - Complete API guide with installation and usage
+- **[Services Guide](docs/CANONICAL_SERVICES.md)** - All supported data sources and adapters
+- **[Adding New Services](docs/EXTENDING_SERVICES.md)** - How to add adapters (includes NOAA example)
+- **[Credentials Setup](docs/CREDENTIALS.md)** - API key configuration for all services
+- **[Local Development](docs/LOCAL_DEVELOPMENT.md)** - Development environment setup
 
 ### Examples and Tutorials
 - **[Jupyter Notebooks](notebooks/)** - Interactive tutorials and demos
-- **[Example Scripts](examples/)** - Common usage patterns
-- **[Production Patterns](docs/PRODUCTION_PATTERNS.md)** - Enterprise deployment
+- **[Example Scripts](examples/)** - Common usage patterns and quick start
 
 ## 🧪 Testing
 

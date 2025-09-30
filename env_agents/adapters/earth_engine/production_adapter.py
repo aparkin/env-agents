@@ -282,8 +282,88 @@ class ProductionEarthEngineAdapter(BaseAdapter):
 
     def _query_image_collection(self, region, bbox: list, center_lat: float, center_lon: float,
                                 start_date: str, end_date: str) -> List[Dict]:
-        """Query ImageCollection asset"""
+        """Query ImageCollection asset with automatic temporal fallback"""
+
+        # Store original requested dates for metadata
+        requested_start = start_date
+        requested_end = end_date
+        fallback_applied = False
+        fallback_reason = None
+
+        # First attempt: try requested date range
         ic = ee.ImageCollection(self.asset_id).filterDate(start_date, end_date).filterBounds(region)
+
+        # Check if we have any images
+        def check_size():
+            return ic.size().getInfo()
+
+        try:
+            count = run_with_timeout(check_size, timeout_sec=30)
+        except TimeoutError as e:
+            raise Exception(f"Earth Engine timeout (checking image count): {e}") from e
+
+        # If no images found, try temporal fallback
+        if count == 0:
+            logger.warning(f"No images found for {self.asset_id} in {start_date} to {end_date}, attempting temporal fallback")
+            fallback_applied = True
+
+            # Get collection's actual date range
+            full_collection = ee.ImageCollection(self.asset_id).filterBounds(region)
+
+            def get_date_range():
+                dates = full_collection.aggregate_array('system:time_start').getInfo()
+                if not dates:
+                    return None, None
+                import datetime
+                min_ts = min(dates)
+                max_ts = max(dates)
+                min_date = datetime.datetime.fromtimestamp(min_ts / 1000).strftime('%Y-%m-%d')
+                max_date = datetime.datetime.fromtimestamp(max_ts / 1000).strftime('%Y-%m-%d')
+                return min_date, max_date
+
+            try:
+                available_start, available_end = run_with_timeout(get_date_range, timeout_sec=30)
+            except TimeoutError as e:
+                raise Exception(f"Earth Engine timeout (getting date range): {e}") from e
+
+            if not available_start or not available_end:
+                logger.warning(f"No images found for {self.asset_id} at this location")
+                return []
+
+            # Use most recent year available if requested date is too late
+            if requested_start > available_end:
+                fallback_reason = f"requested_date_{requested_start}_after_dataset_end_{available_end}"
+                # Use most recent year
+                end_year = available_end[:4]
+                start_date = f"{end_year}-01-01"
+                end_date = f"{end_year}-12-31"
+                logger.info(f"Falling back to most recent year: {start_date} to {end_date}")
+            # Use oldest year available if requested date is too early
+            elif requested_end < available_start:
+                fallback_reason = f"requested_date_{requested_end}_before_dataset_start_{available_start}"
+                start_year = available_start[:4]
+                start_date = f"{start_year}-01-01"
+                end_date = f"{start_year}-12-31"
+                logger.info(f"Falling back to oldest year: {start_date} to {end_date}")
+            else:
+                # Requested range overlaps with available range, use available range
+                fallback_reason = f"no_data_in_requested_range_using_available_{available_start}_to_{available_end}"
+                start_date = available_start
+                end_date = available_end
+                logger.info(f"Using full available range: {start_date} to {end_date}")
+
+            # Re-filter with fallback dates
+            ic = ee.ImageCollection(self.asset_id).filterDate(start_date, end_date).filterBounds(region)
+
+            # Check again
+            try:
+                count = run_with_timeout(check_size, timeout_sec=30)
+            except TimeoutError as e:
+                raise Exception(f"Earth Engine timeout (checking fallback count): {e}") from e
+
+            if count == 0:
+                logger.warning(f"No images found even after fallback for {self.asset_id}")
+                return []
 
         # Get band names from first image (with timeout)
         def get_bands():
@@ -294,6 +374,12 @@ class ProductionEarthEngineAdapter(BaseAdapter):
             band_names = run_with_timeout(get_bands, timeout_sec=30)
         except TimeoutError as e:
             raise Exception(f"Earth Engine timeout (metadata fetch): {e}") from e
+        except Exception as e:
+            # Handle "image is null" errors more gracefully
+            if "is required and may not be null" in str(e):
+                logger.warning(f"No valid images found for {self.asset_id} after filtering")
+                return []
+            raise
 
         if not band_names:
             return []
@@ -322,7 +408,7 @@ class ProductionEarthEngineAdapter(BaseAdapter):
         except TimeoutError as e:
             raise Exception(f"Earth Engine timeout (data fetch): {e}") from e
 
-        # Convert to standard schema
+        # Convert to standard schema with temporal fallback metadata
         rows = []
         for feat in features:
             props = feat["properties"]
@@ -331,6 +417,21 @@ class ProductionEarthEngineAdapter(BaseAdapter):
             if date:
                 for variable, value in props.items():
                     if value is not None:
+                        # Build attributes with temporal metadata
+                        attributes = {
+                            "asset_id": self.asset_id,
+                            "scale_m": self.scale,
+                            "requested_date_range": f"{requested_start}_to_{requested_end}",
+                            "actual_date_range": f"{start_date}_to_{end_date}"
+                        }
+
+                        # Add fallback metadata if applicable
+                        if fallback_applied:
+                            attributes["temporal_fallback_applied"] = True
+                            attributes["temporal_fallback_reason"] = fallback_reason
+                        else:
+                            attributes["temporal_fallback_applied"] = False
+
                         rows.append({
                             "observation_id": f"ee_{self.asset_id.replace('/', '_')}_{date}_{variable}",
                             "dataset": self.DATASET,
@@ -347,10 +448,7 @@ class ProductionEarthEngineAdapter(BaseAdapter):
                             "value": float(value),
                             "unit": "",
                             "qc_flag": "ok",
-                            "attributes": {
-                                "asset_id": self.asset_id,
-                                "scale_m": self.scale
-                            }
+                            "attributes": attributes
                         })
 
         return rows

@@ -178,7 +178,8 @@ PHASE1_SERVICES = {
         "asset_id": "MODIS/006/MCD12Q1",  # Land cover classification
         "rate_limit": 2.0,
         "timeout": 60,
-        "time_range": ("2021-01-01", "2021-12-31"),
+        # Dataset ends 2019, but adapter will automatically fall back to most recent year
+        "time_range": ("2019-01-01", "2019-12-31"),  # Use most recent available year
         "is_earth_engine": True,
         "retry_on_quota": True,
         "max_retries": 3,
@@ -208,11 +209,13 @@ PHASE1_SERVICES = {
 
 # Phase 2: Google Embeddings (separate from other EE to manage quotas)
 # OPTIMIZED: 44s avg query time → 5s rate limit (query itself is very slow, minimal wait needed)
+# NOTE: Temporal fallback enabled - if requested dates unavailable, adapter will use closest available data
 PHASE2_SERVICES = {
     "GOOGLE_EMBEDDINGS": {
         "asset_id": "GOOGLE/SATELLITE_EMBEDDING/V1/ANNUAL",
         "rate_limit": 5.0,  # Queries take ~44s themselves, minimal additional wait
         "timeout": 120,
+        # Dataset: 2017-present, adapter will fall back if location lacks 2021 data
         "time_range": ("2021-01-01", "2021-12-31"),
         "is_earth_engine": True,
         "retry_on_quota": True,

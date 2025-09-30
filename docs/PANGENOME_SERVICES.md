@@ -83,6 +83,8 @@ Can run in parallel (independent rate limits).
 
 **MUST run sequentially** due to shared Earth Engine quotas.
 
+**⚙️ Temporal Fallback Enabled**: All Earth Engine services automatically handle out-of-range dates by falling back to closest available data with metadata annotation. See `docs/TEMPORAL_FALLBACK.md` for details.
+
 ### Terrain & Elevation
 
 #### 🔄 SRTM - Shuttle Radar Topography Mission
@@ -112,12 +114,14 @@ Can run in parallel (independent rate limits).
 - **Time:** ~4 hours
 
 #### ⏳ MODIS_LANDCOVER - Land Cover Classification
+- **Status:** Ready to run (temporal fallback implemented)
 - **Asset:** `MODIS/006/MCD12Q1`
 - **Data:** Land cover types (17 IGBP classes)
-- **Temporal:** Annual
+- **Temporal:** Annual (dataset ends 2019)
 - **Resolution:** 500m
 - **Classes:** Forest, grassland, cropland, urban, water, etc.
 - **Time:** ~2.7 hours
+- **Note:** Configured to use 2019 data (most recent available). Temporal fallback will handle any edge cases.
 
 ### Temperature
 
@@ -182,15 +186,16 @@ Can run in parallel (independent rate limits).
 ## Phase 2: Embeddings (1 service)
 
 #### 🟡 GOOGLE_EMBEDDINGS - Satellite Image Features
-- **Status:** Testing
+- **Status:** Ready to run (temporal fallback implemented)
 - **Asset:** `GOOGLE/SATELLITE_EMBEDDING/V1/ANNUAL`
 - **Data:** 64-dimensional feature vectors from deep learning
 - **Source:** Sentinel-2 imagery
-- **Temporal:** Annual composites
+- **Temporal:** Annual composites (2017-present)
 - **Resolution:** 10m
 - **Use:** Image similarity, unsupervised clustering, transfer learning
 - **Expected:** ~4K observations
 - **Time:** ~6.6 hours
+- **Note:** Some locations may have sparse coverage. Temporal fallback will use closest available year if 2021 data missing.
 
 ---
 

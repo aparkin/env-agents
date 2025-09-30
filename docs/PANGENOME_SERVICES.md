@@ -152,7 +152,7 @@ Can run in parallel (independent rate limits).
 - **Time:** ~4 hours
 
 #### ⏳ GPM_PRECIP - High-Resolution Precipitation
-- **Asset:** `NASA/GPM_L3/IMERG_V06`
+- **Asset:** `NASA/GPM_L3/IMERG_V07` (upgraded from deprecated V06)
 - **Data:** Half-hourly global precipitation
 - **Temporal:** 30-minute intervals (aggregate to daily/monthly)
 - **Resolution:** 0.1° (~10km)

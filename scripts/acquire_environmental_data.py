@@ -196,7 +196,7 @@ PHASE1_SERVICES = {
         "backoff_seconds": 60
     },
     "GPM_PRECIP": {
-        "asset_id": "NASA/GPM_L3/IMERG_V06",  # High-resolution precipitation
+        "asset_id": "NASA/GPM_L3/IMERG_V07",  # High-resolution precipitation (V07, V06 deprecated)
         "rate_limit": 3.0,
         "timeout": 90,
         "time_range": ("2021-01-01", "2021-12-31"),

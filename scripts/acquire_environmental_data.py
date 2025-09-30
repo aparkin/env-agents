@@ -175,11 +175,11 @@ PHASE1_SERVICES = {
         "backoff_seconds": 60
     },
     "MODIS_LANDCOVER": {
-        "asset_id": "MODIS/006/MCD12Q1",  # Land cover classification
+        "asset_id": "MODIS/061/MCD12Q1",  # Land cover classification (V061, V006 deprecated)
         "rate_limit": 2.0,
         "timeout": 60,
-        # Dataset ends 2019, but adapter will automatically fall back to most recent year
-        "time_range": ("2019-01-01", "2019-12-31"),  # Use most recent available year
+        # V061 available 2001-2023+, using 2022 as recent stable year
+        "time_range": ("2022-01-01", "2022-12-31"),
         "is_earth_engine": True,
         "retry_on_quota": True,
         "max_retries": 3,

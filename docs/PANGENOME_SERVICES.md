@@ -114,14 +114,14 @@ Can run in parallel (independent rate limits).
 - **Time:** ~4 hours
 
 #### ⏳ MODIS_LANDCOVER - Land Cover Classification
-- **Status:** Ready to run (temporal fallback implemented)
-- **Asset:** `MODIS/006/MCD12Q1`
-- **Data:** Land cover types (17 IGBP classes)
-- **Temporal:** Annual (dataset ends 2019)
+- **Status:** Ready to run (upgraded to V061)
+- **Asset:** `MODIS/061/MCD12Q1` (upgraded from deprecated V006)
+- **Data:** Land cover types via 5 classification schemes (LC_Type1-5)
+- **Temporal:** Annual (2001-2023+), using 2022
 - **Resolution:** 500m
-- **Classes:** Forest, grassland, cropland, urban, water, etc.
+- **Bands:** LC_Type1-5 (different classification systems), LC_Prop1-3 (assessment), QC, LW
+- **Note:** Stores raw categorical values (e.g., 1=Evergreen Forest). Interpretation uses Earth Engine catalog lookup.
 - **Time:** ~2.7 hours
-- **Note:** Configured to use 2019 data (most recent available). Temporal fallback will handle any edge cases.
 
 ### Temperature
 

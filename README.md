@@ -109,16 +109,24 @@ Variables: 190 environmental parameters
 
 ## 📚 Documentation
 
-### Core Documentation
-- **[API Reference](docs/API_REFERENCE.md)** - Complete API guide with installation and usage
-- **[Services Guide](docs/CANONICAL_SERVICES.md)** - All supported data sources and adapters
-- **[Adding New Services](docs/EXTENDING_SERVICES.md)** - How to add adapters (includes NOAA example)
-- **[Credentials Setup](docs/CREDENTIALS.md)** - API key configuration for all services
-- **[Local Development](docs/LOCAL_DEVELOPMENT.md)** - Development environment setup
+**Complete documentation:** [docs/README.md](docs/README.md)
 
-### Examples and Tutorials
-- **[Jupyter Notebooks](notebooks/)** - Interactive tutorials and demos
-- **[Example Scripts](examples/)** - Common usage patterns and quick start
+### Quick Links
+- **[Installation Guide](docs/INSTALLATION.md)** - Get env-agents installed and running
+- **[Quick Start](docs/QUICK_START.md)** - Your first query in 5 minutes
+- **[API Reference](docs/API_REFERENCE.md)** - Complete API documentation
+- **[Services Guide](docs/SERVICES.md)** - All 16+ data sources and capabilities
+- **[Credentials Setup](docs/CREDENTIALS.md)** - Configure API keys
+
+### For Developers
+- **[Architecture](docs/development/ARCHITECTURE.md)** - System design and components
+- **[Adding New Services](docs/EXTENDING_SERVICES.md)** - Create custom adapters
+- **[Local Development](docs/development/LOCAL_DEVELOPMENT.md)** - Development environment
+
+### Production Operations
+- **[Pangenome Pipeline](docs/operations/PANGENOME_PIPELINE.md)** - Production data acquisition
+- **[Database Management](docs/operations/DATABASE_MANAGEMENT.md)** - Managing data storage
+- **[Earth Engine Operations](docs/operations/EARTH_ENGINE_NOTES.md)** - EE-specific guidance
 
 ## 🧪 Testing
 

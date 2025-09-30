@@ -482,6 +482,37 @@ plt.scatter(env_2d[:, 0], env_2d[:, 1], c=phylum_dominance, cmap='tab20')
 - "What environments predict Actinomycetota presence?"
 - Compare niches across taxa to find environmental axes of differentiation
 
+**Critical Addition: Hierarchical Divergence Analysis**
+- **Goal:** Identify at what taxonomic level environmental preferences diverge
+- **Question:** Where in the tree do children split in environmental distribution?
+- **Example:**
+  - Proteobacteria (phylum) = widespread across environments
+  - BUT Alphaproteobacteria (class) = oligotrophic (low nutrients)
+  - AND Gammaproteobacteria (class) = copiotrophic (high nutrients)
+  - **→ Class level is where environmental niche differentiation occurs**
+
+- **Method:** For each parent taxon, compare environmental models of children
+  ```python
+  # Example: Proteobacteria children
+  for child_class in ['Alpha', 'Beta', 'Gamma', 'Delta']:
+      model_child = fit_model(X_env, y=proteobacteria[child_class])
+      importance_child[child_class] = model_child.feature_importances_
+
+  # Compare: Do children differ in which env vars predict them?
+  # If YES → environmental differentiation at this level
+  # If NO → children are ecologically similar, look deeper in tree
+  ```
+
+- **Statistical test:** Do siblings have significantly different environmental predictors?
+  - Compare top-10 features between sibling taxa
+  - Permutation test: Are observed differences > random?
+
+- **Output:** "Environmental differentiation tree" showing where niche splits occur
+  - Phylum level: broad differences (aquatic vs terrestrial)
+  - Class level: nutrient strategies (oligotroph vs copiotroph)
+  - Order level: specific substrate preferences
+  - Family/genus: microhabitat specialization?
+
 ### 5.2 CatBoost Gradient-Boosted Decision Tree (GBDT)
 
 **Why CatBoost:**
@@ -694,7 +725,136 @@ X['aridity_index'] = X['precipitation'] / X['evapotranspiration']
 X['temp_x_soil_pH'] = X['temperature'] * X['soil_pH']
 ```
 
-### 5.6 Model Interpretation
+### 5.6 Hierarchical Divergence Analysis (NEW SECTION)
+
+**Goal:** Identify where in the taxonomic tree environmental niche differentiation occurs
+
+**Approach: Recursive Environmental Niche Comparison**
+
+```python
+def analyze_taxonomic_split(parent_taxon, taxonomic_level):
+    """
+    For a parent taxon, compare environmental models of its children.
+    Returns: divergence score, key differentiating variables
+    """
+    # Get all children at next level
+    children = get_children(parent_taxon, level=taxonomic_level)
+
+    # Build model for each child
+    models = {}
+    importances = {}
+    for child in children:
+        y_child = df_tax[child + '_present']
+        model = CatBoostClassifier().fit(X_env, y_child)
+        models[child] = model
+        importances[child] = model.feature_importances_
+
+    # Compare feature importances across siblings
+    # Method 1: Correlation of importance vectors
+    from scipy.stats import spearmanr
+    correlations = []
+    for i, child1 in enumerate(children):
+        for child2 in children[i+1:]:
+            rho, p = spearmanr(importances[child1], importances[child2])
+            correlations.append((child1, child2, rho, p))
+
+    # Method 2: Identify discriminating variables
+    # Which variables have HIGH importance for one child but LOW for sibling?
+    divergent_vars = []
+    for var_idx, var_name in enumerate(X_env.columns):
+        var_importances = [importances[child][var_idx] for child in children]
+        if np.std(var_importances) > threshold:  # High variance across siblings
+            divergent_vars.append({
+                'variable': var_name,
+                'importances': dict(zip(children, var_importances)),
+                'variance': np.std(var_importances)
+            })
+
+    # Method 3: Permutation test for significance
+    # Are observed differences > random shuffling of taxon labels?
+    null_divergences = []
+    for _ in range(100):
+        shuffled_labels = np.random.permutation(taxon_labels)
+        null_div = compute_divergence(shuffled_labels)
+        null_divergences.append(null_div)
+
+    p_value = np.mean(observed_divergence > null_divergences)
+
+    return {
+        'parent': parent_taxon,
+        'level': taxonomic_level,
+        'children': children,
+        'divergence_score': observed_divergence,
+        'p_value': p_value,
+        'key_variables': divergent_vars[:10],  # Top 10
+        'sibling_correlations': correlations
+    }
+
+# Apply recursively down the tree
+results = []
+for phylum in major_phyla:
+    # Check if classes within phylum diverge
+    div_class = analyze_taxonomic_split(phylum, level='class')
+    results.append(div_class)
+
+    # If significant divergence, check orders within each class
+    if div_class['p_value'] < 0.05:
+        for child_class in div_class['children']:
+            div_order = analyze_taxonomic_split(child_class, level='order')
+            results.append(div_order)
+```
+
+**Visualization: Environmental Differentiation Tree**
+
+```python
+# Dendrogram-style plot showing where environmental niches split
+import matplotlib.pyplot as plt
+from scipy.cluster.hierarchy import dendrogram
+
+fig, ax = plt.subplots(figsize=(12, 8))
+
+# Plot taxonomic tree, colored by divergence score
+# Branches colored by KEY environmental variable causing split
+# Example:
+#   Proteobacteria ──┬── Alphaproteobacteria (nutrient-poor, HIGH divergence)
+#                    ├── Betaproteobacteria
+#                    └── Gammaproteobacteria (nutrient-rich, HIGH divergence)
+#
+# Annotate branches with key discriminating variables
+# "pH: 5.2" = Alphaproteobacteria prefer acidic
+# "C:N: 15" = Gammaproteobacteria prefer high C:N
+```
+
+**Output Table: Niche Differentiation Summary**
+
+| Parent Taxon | Level | Divergence Score | p-value | Key Discriminating Variables |
+|--------------|-------|------------------|---------|------------------------------|
+| Proteobacteria | Class | 0.82 | <0.001 | Soil C (0.45), pH (0.38), NDVI (0.31) |
+| Actinomycetota | Class | 0.35 | 0.12 | (No significant divergence) |
+| Acidobacteriota | Order | 0.67 | 0.003 | pH (0.52), temp (0.41) |
+
+**Biological Interpretation:**
+
+- **High divergence at Class level:** Suggests major ecological strategies split early
+- **Low divergence until Order level:** Ecological conservatism - niche inherited from ancestor
+- **Key variables:** Identifies WHICH environmental axes drive differentiation
+
+**Applications:**
+
+1. **Taxonomic resolution for analysis:** Focus modeling at the level where niches diverge
+   - If Proteobacteria classes have different niches → model at class level
+   - If Acidobacteria classes similar → stay at phylum level
+
+2. **Trait-based ecology:** Correlate divergence with functional gene content
+   - Do clades with high divergence have more metabolic diversity?
+
+3. **Predictive biogeography:**
+   - High-divergence clades = specialist lineages
+   - Low-divergence clades = generalist lineages
+
+**Script:** `11c_hierarchical_divergence.py`
+
+### 5.7 Model Interpretation
 
 **Global interpretation:**
 
@@ -870,11 +1030,24 @@ rules = export_text(tree, feature_names=X.columns)
    - 2D heatmaps: Top 3 pairwise interactions (e.g., temp × precipitation)
    - Partial dependence: How diversity changes across gradients
 
-7. **Figure 7: Biological interpretation**
+7. **Figure 7: Hierarchical Divergence Analysis** (NEW - KEY FIGURE)
+   - **Environmental differentiation tree:** Taxonomic tree annotated with divergence scores
+     - Branch thickness = divergence strength
+     - Branch color = key environmental variable driving split
+     - Nodes labeled with p-values
+   - **Heatmap of discriminating variables:**
+     - Rows = taxonomic splits (Proteobacteria→Classes, etc.)
+     - Columns = environmental variables
+     - Color = importance variance across siblings
+   - **Example splits with environmental distributions:**
+     - Violin plots showing Alpha vs Gamma proteobacteria across soil C gradient
+     - Box plots of pH preferences across Acidobacteria orders
+
+8. **Figure 8: Biological interpretation**
    - Niche plots: Environmental optima for each phylum (violin plots)
    - Decision tree: Interpretable rules for phylum prediction
 
-8. **Figure 8: Spatial predictions**
+9. **Figure 9: Spatial predictions**
    - Map: Predicted vs observed diversity
    - Residual map: Where does model fail? (spatial structure in errors?)
 
@@ -884,6 +1057,12 @@ rules = export_text(tree, feature_names=X.columns)
 2. **Table 2:** Model comparison (CatBoost vs alternatives, with CV scores)
 3. **Table 3:** Top 20 features ranked by importance with interpretation
 4. **Table 4:** Phylum-specific environmental preferences (mean ± SD for top 5 predictors)
+5. **Table 5: Taxonomic Divergence Summary** (NEW)
+   - Columns: Parent Taxon | Taxonomic Level | Divergence Score | p-value | Key Discriminating Variables | Interpretation
+   - Example rows:
+     - Proteobacteria | Class | 0.82 | <0.001 | Soil C, pH, NDVI | Copiotrophic vs oligotrophic split
+     - Acidobacteriota | Order | 0.67 | 0.003 | pH, temperature | Acidophile specialization
+     - Actinomycetota | Class | 0.35 | 0.12 | (none) | Ecologically conserved
 
 ### 8.3 Supplementary Materials
 

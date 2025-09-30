@@ -310,6 +310,21 @@ data/auth/
 data/cache/
 *.log
 
+# Databases (large, generated files - not for version control)
+*.db
+*.sqlite
+*.sqlite3
+pangenome_env_data/
+**/pangenome_env_data/
+
+# Large data files (samples, clusters, results)
+notebooks/*.csv
+notebooks/*.tsv
+notebooks/*.ipynb
+!notebooks/env_agents_core_demo.ipynb
+!notebooks/env_agents_comprehensive_tutorial.ipynb
+!notebooks/README.md
+
 # macOS
 .DS_Store
 .AppleDouble

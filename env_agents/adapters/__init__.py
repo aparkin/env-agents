@@ -14,8 +14,8 @@ from .air.adapter import EPAAQSAdapter as EPA_AQS
 from .nwis.adapter import USGSNWISAdapter as USGS_NWIS
 from .ssurgo.adapter import SSURGOAdapter as SSURGO
 
-# META-SERVICES - Clean Naming
-from .earth_engine.gold_standard_adapter import EarthEngineAdapter as EARTH_ENGINE
+# META-SERVICES - Clean Naming (using lean production adapter)
+from .earth_engine import EarthEngineAdapter as EARTH_ENGINE
 
 # Canonical service list for programmatic access
 CANONICAL_SERVICES = {

@@ -478,40 +478,87 @@ class USGSNWISAdapter(BaseAdapter, StandardAdapterMixin):
         """
         # Implement USGS NWIS API calls directly
         try:
-            # Default parameters for water quality
-            params = spec.variables or ["00010", "00095", "00400"]  # temp, conductivity, pH
-            
-            # Build USGS NWIS API URL
-            base_url = "https://waterservices.usgs.gov/nwis/iv"
-            
-            # Get bbox from spec
-            bbox = getattr(spec, 'bbox', None)
-            if not bbox:
-                # Default to a test location if no bbox provided
-                bbox = [-77.1, 38.8, -77.0, 38.9]  # Washington DC area
-            
+            # Get comprehensive list of parameters if not specified
+            # If spec.variables is None, we query for a comprehensive set of common parameters
+            # to maximize data retrieval while keeping response manageable
+            if spec.variables is None:
+                # Comprehensive list of common USGS daily value parameters
+                # These are ordered by frequency/importance
+                default_params = [
+                    # Physical (most common)
+                    "00060",  # Discharge/streamflow - 96% of gauges
+                    "00065",  # Gage height - 64% of gauges
+                    # Temperature
+                    "00010",  # Water temperature - 69% of gauges
+                    "00020",  # Air temperature
+                    # Water quality - basic
+                    "00095",  # Specific conductance - 20% of gauges
+                    "00400",  # pH - 15% of gauges
+                    "00300",  # Dissolved oxygen
+                    # Sediment
+                    "80154",  # Suspended sediment concentration
+                    "80155",  # Suspended sediment discharge
+                    # Turbidity
+                    "63680",  # Turbidity
+                    "00076",  # Turbidity (alternative)
+                    # Precipitation
+                    "00045",  # Precipitation
+                    # Nutrients (less common but important)
+                    "00665",  # Total phosphorus
+                    "00666",  # Phosphate dissolved
+                    "00618",  # Nitrate
+                    "00631",  # NO2+NO3
+                ]
+                params = default_params
+            else:
+                params = spec.variables
+
+            # Build USGS NWIS API URL - use DAILY VALUES (dv) not instantaneous (iv)
+            base_url = "https://waterservices.usgs.gov/nwis/dv"
+
+            # Get bbox from geometry
+            if spec.geometry.type == "bbox":
+                coords = spec.geometry.coordinates
+                bbox = [coords[0], coords[1], coords[2], coords[3]]  # minlon, minlat, maxlon, maxlat
+            elif spec.geometry.type == "point":
+                lon, lat = spec.geometry.coordinates
+                # Add small buffer for point queries
+                bbox = [lon - 0.1, lat - 0.1, lon + 0.1, lat + 0.1]
+            else:
+                raise ValueError(f"Unsupported geometry type: {spec.geometry.type}")
+
             # Convert parameter codes to comma-separated string
             param_codes = ",".join(params) if isinstance(params, list) else str(params)
-            
+
             url_params = {
                 "format": "json",
                 "parameterCd": param_codes,
                 "bBox": ",".join(map(str, bbox)),
-                "siteStatus": "active"
+                "siteStatus": "all"  # Changed from "active" to get historical data
             }
-            
-            # Add date range if specified
-            if hasattr(spec, 'start_date') and spec.start_date:
-                url_params["startDT"] = spec.start_date.strftime("%Y-%m-%d")
-            if hasattr(spec, 'end_date') and spec.end_date:
-                url_params["endDT"] = spec.end_date.strftime("%Y-%m-%d")
+
+            # Add date range from time_range
+            if spec.time_range:
+                start_date, end_date = spec.time_range
+                url_params["startDT"] = start_date
+                url_params["endDT"] = end_date
             
             # Make API request
             response = requests.get(base_url, params=url_params, timeout=30)
+
+            # Handle 400 errors gracefully (usually means no data or outside US coverage)
+            if response.status_code == 400:
+                logger.debug(f"USGS NWIS returned 400 for bbox {bbox} - likely outside US coverage or no data")
+                return []  # Return empty list, not an error
+
             response.raise_for_status()
-            
+
             data = response.json()
             time_series = data.get("value", {}).get("timeSeries", [])
+
+            # If no time series data, return empty list (not an error)
+            if not time_series:
+                return []
             
             rows = []
             retrieval_timestamp = datetime.now(timezone.utc).isoformat()

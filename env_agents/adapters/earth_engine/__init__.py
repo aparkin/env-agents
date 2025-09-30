@@ -5,6 +5,6 @@ Provides access to Google Earth Engine assets as individual services
 within the env-agents framework.
 """
 
-from .gold_standard_adapter import EarthEngineAdapter
+from .production_adapter import ProductionEarthEngineAdapter as EarthEngineAdapter
 
 __all__ = ['EarthEngineAdapter']

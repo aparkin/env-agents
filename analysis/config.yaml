@@ -1,0 +1,243 @@
+# Configuration for Environmental-Taxonomic Analysis
+# ======================================================
+
+# Data Sources
+# ------------
+paths:
+  database: "../notebooks/pangenome_env_data/pangenome_env.db"
+  taxonomy: "../notebooks/df_gtdb_tagged_cleaneed.tsv"
+  cluster_locations: "../notebooks/date_and_latlon_samples_extended.tsv"
+  output_dir: "./data"
+  results_dir: "./results"
+
+database:
+  env_table: "env_observations"
+  cluster_table: "spatial_clusters"
+  genome_table: "genome_samples"
+
+# Data Selection
+# --------------
+selection:
+  min_genomes_per_cluster: 1  # Minimum genomes to include cluster
+  min_observations_per_variable: 100  # Drop vars with <100 observations total
+
+# Taxonomic Scope
+# ---------------
+taxonomy:
+  levels: ["phylum", "class", "order", "family", "genus"]
+  min_prevalence: 0.01  # Taxon must be present in ≥1% of clusters (48 clusters)
+  major_phyla:  # Pre-defined major phyla to always include
+    - Pseudomonadota  # (formerly Proteobacteria)
+    - Bacillota  # (formerly Firmicutes)
+    - Actinomycetota  # (formerly Actinobacteria)
+    - Bacteroidota
+    - Acidobacteriota
+    - Planctomycetota
+    - Verrucomicrobiota
+    - Chloroflexota
+    - Cyanobacteriota
+    - Gemmatimonadota
+
+# Environmental Services
+# ----------------------
+services:
+  include:  # Services to include in analysis
+    - NASA_POWER
+    - WorldClim
+    - SoilGrids_pH
+    - SoilGrids_BulkDensity
+    - SoilGrids_ClayContent
+    - SoilGrids_SandContent
+    - SoilGrids_SiltContent
+    - SoilGrids_OrganicCarbon
+    - MODIS_NDVI
+    - MODIS_EVI
+    - MODIS_LST
+    - MODIS_LANDCOVER
+    - SRTM
+    - GBIF
+    - TerraClimate
+    - OpenAQ
+    # USGS_NWIS: very sparse (0.4% coverage)
+    # Google_Embeddings: handle separately (high-dimensional)
+
+  exclude:  # Services to explicitly exclude
+    - GPM_PRECIP  # Too slow (>10min per cluster)
+
+  temporal_aggregation:  # How to aggregate time-series data
+    default: "mean"  # Annual mean
+    alternatives:
+      - "std"   # Standard deviation (variability)
+      - "min"   # Annual minimum
+      - "max"   # Annual maximum
+      - "range" # max - min (seasonality)
+
+# Missing Data
+# ------------
+missing:
+  variable_completeness_threshold: 0.70  # Keep variables with ≥70% data
+  cluster_completeness_threshold: 0.50   # Keep clusters with ≥50% of variables
+
+  imputation_strategy:
+    primary: "complete_case"  # Use complete cases for core analysis
+    sensitivity: "mice"  # Multiple imputation for sensitivity analysis
+    spatial: "kriging"  # Spatial interpolation for spatially autocorrelated vars
+
+  missing_indicator: true  # Add X_missing binary flags for sparse variables
+
+# Phase 1: Data Preparation
+# --------------------------
+phase1:
+  pivot_agg_func: "mean"  # Aggregation for multiple obs per cluster-variable
+  save_long_format: true  # Also save long-format data
+  variable_prefix: true   # Prefix variables with service name (e.g., NASA_POWER__temperature)
+
+# Phase 2: EDA
+# ------------
+phase2:
+  correlation_threshold: 0.9  # Flag highly correlated pairs (|r| > 0.9)
+  vif_threshold: 10  # Variance Inflation Factor threshold for multicollinearity
+  univariate_alpha: 0.01  # Significance level (Bonferroni corrected)
+
+# Phase 3: Dimensionality Reduction
+# ----------------------------------
+phase3:
+  variance_threshold: 0.01  # Drop variables with <1% variance
+  pca_variance_explained: 0.90  # Keep PCs explaining 90% variance
+
+  pca_by_domain:  # Apply PCA separately to variable families
+    climate: ["NASA_POWER", "WorldClim", "TerraClimate"]
+    soil: ["SoilGrids"]
+    vegetation: ["MODIS_NDVI", "MODIS_EVI", "MODIS_LST"]
+    # Google embeddings handled separately
+
+  core_variables:  # Always keep these (domain knowledge)
+    - "SoilGrids_pH__pH_0-5cm"
+    - "SoilGrids_OrganicCarbon__carbon_0-5cm"
+    - "NASA_POWER__temperature_mean"
+    - "NASA_POWER__precipitation_total"
+    - "MODIS_NDVI__NDVI_mean"
+    - "SRTM__elevation"
+
+# Phase 4: Imputation
+# -------------------
+phase4:
+  mice_iterations: 10
+  mice_random_state: 42
+  kriging_variogram_model: "spherical"
+  nn_neighbors: 5  # Nearest neighbors for spatial imputation
+
+# Phase 5: Modeling
+# -----------------
+modeling:
+  test_size: 0.2
+  cv_folds: 5
+  random_state: 42
+
+  catboost:
+    iterations: 1000
+    learning_rate: 0.05
+    depth: 6
+    l2_leaf_reg: 3
+    border_count: 128
+    early_stopping_rounds: 50
+    loss_function: "Logloss"  # For binary classification
+    eval_metric: "AUC"
+    task_type: "CPU"  # Change to "GPU" if available
+    verbose: 100
+
+  feature_selection:
+    method: "rfecv"  # Recursive feature elimination with CV
+    step: 3  # Remove 3 features per iteration
+    min_features: 10  # Stop at 10 features minimum
+
+  conditional_importance:
+    n_permutations: 100
+    confound_groups:  # Test these specific confounds
+      - ["SoilGrids_pH__pH_0-5cm", "SoilGrids_OrganicCarbon__carbon_0-5cm"]
+      - ["NASA_POWER__temperature_mean", "SRTM__elevation"]
+      - ["NASA_POWER__precipitation_total", "MODIS_NDVI__NDVI_mean"]
+
+# Phase 5c: Hierarchical Divergence
+# ----------------------------------
+divergence:
+  min_prevalence: 0.05  # Child taxa must be in ≥5% clusters
+  divergence_threshold: 0.40  # Recurse deeper if divergence > 0.40
+  correlation_threshold: 0.70  # Low correlation (< 0.7) indicates divergence
+  n_permutations: 100  # For significance testing
+  top_discriminating_vars: 10  # Report top 10 discriminating variables
+
+# Phase 6: Validation
+# -------------------
+validation:
+  spatial_holdout_regions:
+    - "North_America"
+    - "Europe"
+    - "Asia"
+    - "South_America"
+    - "Africa"
+    - "Oceania"
+
+  sensitivity_analyses:
+    - imputation_method: ["complete_case", "mice", "spatial"]
+    - taxonomic_resolution: ["phylum", "class", "order"]
+    - variable_selection: ["core_only", "pca_features", "all_variables"]
+    - model_algorithm: ["catboost", "random_forest", "elastic_net"]
+
+# Phase 7: Interpretation
+# -----------------------
+interpretation:
+  shap_sample_size: 500  # Subsample for SHAP computation (expensive)
+  partial_dependence_grid_resolution: 50
+  interaction_top_n: 10  # Report top 10 interactions
+
+  hypothesis_tests:
+    - name: "pH_Acidobacteria"
+      taxon: "Acidobacteriota"
+      variable: "SoilGrids_pH__pH_0-5cm"
+      direction: "negative"  # Expect negative correlation
+    - name: "Aridity_Actinomycetota"
+      taxon: "Actinomycetota"
+      variable: "aridity_index"  # Computed as precip/PET
+      direction: "negative"
+
+# Phase 8: Reporting
+# ------------------
+reporting:
+  figure_format: "pdf"
+  figure_dpi: 300
+  table_format: "csv"
+
+  figures:
+    - fig1_data_overview
+    - fig2_environmental_gradients
+    - fig3_univariate_associations
+    - fig4_model_performance
+    - fig5_feature_importance
+    - fig6_interactions
+    - fig7_hierarchical_divergence
+    - fig8_biological_interpretation
+    - fig9_spatial_predictions
+
+  supplementary:
+    - supp_fig_missing_data
+    - supp_fig_correlation_matrix
+    - supp_fig_pca_loadings
+    - supp_fig_calibration_plots
+    - supp_table_all_importances
+    - supp_table_shap_values
+
+# Computational
+# -------------
+compute:
+  n_jobs: -1  # Use all available cores (-1)
+  memory_limit_gb: 32  # Limit memory usage
+  cache_enabled: true
+  verbose: 1  # Verbosity level (0=silent, 1=progress, 2=debug)
+
+# Reproducibility
+# ---------------
+reproducibility:
+  random_seed: 42
+  save_environment: true  # Save conda/pip environment
+  git_commit: true  # Auto-commit results with git hash

@@ -1,0 +1,30 @@
+# Analysis outputs (too large for git)
+data/
+*.parquet
+*.h5
+*.hdf5
+
+# Trained models (can be large)
+results/models/*.cbm
+results/models/*.pkl
+
+# Jupyter checkpoints
+.ipynb_checkpoints/
+*/.ipynb_checkpoints/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+analysis_lib/__pycache__/
+
+# Temporary files
+*.tmp
+*.log
+.DS_Store
+
+# Keep directory structure
+!data/.gitkeep
+!results/figures/.gitkeep
+!results/tables/.gitkeep
+!results/models/.gitkeep

@@ -11,15 +11,18 @@ def load_config(config_path: Union[str, Path] = 'config.yaml') -> Dict[str, Any]
     """
     Load analysis configuration from YAML file.
 
+    Paths in the config are relative to the env-agents root directory.
+    This function finds the root and resolves all paths appropriately.
+
     Parameters
     ----------
     config_path : str or Path
-        Path to config.yaml file
+        Path to config.yaml file (relative to current directory)
 
     Returns
     -------
     dict
-        Configuration dictionary
+        Configuration dictionary with resolved paths
 
     Examples
     --------
@@ -28,10 +31,48 @@ def load_config(config_path: Union[str, Path] = 'config.yaml') -> Dict[str, Any]
     """
     config_path = Path(config_path)
     if not config_path.exists():
-        raise FileNotFoundError(f"Config file not found: {config_path}")
+        # Try to find config by walking up directories
+        current = Path.cwd()
+        for parent in [current] + list(current.parents):
+            candidate = parent / 'analysis' / 'config.yaml'
+            if candidate.exists():
+                config_path = candidate
+                break
+
+        if not config_path.exists():
+            raise FileNotFoundError(
+                f"Config file not found: {config_path}\n"
+                f"Searched from: {Path.cwd()}"
+            )
 
     with open(config_path) as f:
         config = yaml.safe_load(f)
+
+    # Find env-agents root
+    # Config is at: env-agents/analysis/config.yaml
+    # So config_path.parent = analysis/, and config_path.parent.parent = env-agents/
+    config_resolved = config_path.resolve()
+
+    # Find 'analysis' directory in the path
+    analysis_dir = None
+    for parent in config_resolved.parents:
+        if parent.name == 'analysis':
+            analysis_dir = parent
+            break
+
+    if analysis_dir is None:
+        raise RuntimeError(f"Could not find 'analysis' directory in path: {config_resolved}")
+
+    # Root is parent of analysis/
+    root = analysis_dir.parent
+
+    # Resolve all paths in config relative to root
+    if 'paths' in config:
+        for key, value in config['paths'].items():
+            if isinstance(value, str) and not value.startswith('/'):
+                # Convert relative path to absolute
+                absolute_path = root / value
+                config['paths'][key] = str(absolute_path.resolve())
 
     return config
 

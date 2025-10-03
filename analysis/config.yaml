@@ -4,11 +4,12 @@
 # Data Sources
 # ------------
 paths:
-  database: "../notebooks/pangenome_env_data/pangenome_env.db"
+  # Note: Paths are relative to analysis/ directory
+  database: "../notebooks/pangenome_env_data/pangenome_env.db"  # 343 MB, active database
   taxonomy: "../notebooks/df_gtdb_tagged_cleaneed.tsv"
   cluster_locations: "../notebooks/date_and_latlon_samples_extended.tsv"
-  output_dir: "./data"
-  results_dir: "./results"
+  output_dir: "./data"  # analysis/data/ (intermediate outputs)
+  results_dir: "./results"  # analysis/results/ (publication outputs)
 
 database:
   env_table: "env_observations"

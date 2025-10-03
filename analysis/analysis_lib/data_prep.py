@@ -53,15 +53,16 @@ def extract_environmental_data(
     conn = sqlite3.connect(db_path)
 
     # Base query
+    # Note: Actual schema uses time_stamp, lat, lon (not time, latitude, longitude)
     query = """
     SELECT
         cluster_id,
         service_name,
         variable,
         value,
-        time,
-        latitude,
-        longitude
+        time_stamp as time,
+        lat as latitude,
+        lon as longitude
     FROM env_observations
     WHERE 1=1
     """

@@ -91,9 +91,14 @@ def _ensure_ee_authenticated():
     # Search for service account key in standard locations
     credentials_path = None
     search_paths = [
+        'credentials/ecognita-470619-e9e223ea70a7.json',
         'config/ecognita-470619-e9e223ea70a7.json',
+        '../credentials/ecognita-470619-e9e223ea70a7.json',
         '../config/ecognita-470619-e9e223ea70a7.json',
+        '../../credentials/ecognita-470619-e9e223ea70a7.json',
         '../../config/ecognita-470619-e9e223ea70a7.json',
+        Path.cwd() / "credentials",
+        Path.cwd().parent / "credentials",
         Path.cwd() / "config",
         Path.cwd().parent / "config"
     ]

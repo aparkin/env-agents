@@ -32,6 +32,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from env_agents.adapters import CANONICAL_SERVICES
 from env_agents.core.models import RequestSpec, Geometry
+from env_agents.core.ids import compute_observation_id
 
 
 # Service configurations with rate limiting
@@ -408,13 +409,13 @@ class EnvironmentalDataAcquisition:
         if status_filter is None:  # Only clear observations if clearing all records
             try:
                 obs_deleted = conn.execute("""
-                DELETE FROM environmental_observations
-                WHERE dataset = ?
+                DELETE FROM env_observations
+                WHERE service_name = ?
                 """, (service_name,))
                 self.logger.info(f"Cleared {obs_deleted.rowcount} observations for {service_name}")
             except sqlite3.OperationalError as e:
                 if "no such table" in str(e):
-                    self.logger.debug("environmental_observations table doesn't exist yet (no observations stored)")
+                    self.logger.debug("env_observations table doesn't exist yet (no observations stored)")
                 else:
                     raise
 
@@ -526,11 +527,28 @@ class EnvironmentalDataAcquisition:
         return ("error", 0, 0, "Max retries exceeded")
 
     def _store_observations(self, cluster_id: int, service_name: str, rows: List[Dict]) -> int:
-        """Store environmental observations"""
+        """
+        Store environmental observations with proper observation IDs.
+
+        CRITICAL: adapter._fetch_rows() returns raw dicts without observation_ids.
+        We must compute them here using the canonical compute_observation_id() function,
+        which creates deterministic SHA256 hashes from: dataset, spatial_id, time,
+        variable, depth, lat/lon (6 decimals). This ensures each observation has a
+        unique, reproducible identifier.
+        """
+        if not rows:
+            return 0
+
+        # Convert to DataFrame to compute observation_ids
+        df = pd.DataFrame(rows)
+
+        # Compute unique observation IDs using the canonical function
+        df['observation_id'] = compute_observation_id(df)
+
         conn = sqlite3.connect(self.db_path)
 
         obs_data = []
-        for row in rows:
+        for idx, row in df.iterrows():
             obs_data.append((
                 row.get('observation_id'),
                 cluster_id,

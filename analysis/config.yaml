@@ -43,25 +43,20 @@ taxonomy:
 # Environmental Services
 # ----------------------
 services:
-  include:  # Services to include in analysis
+  include:  # Services to include in analysis (match database service_name exactly)
     - NASA_POWER
-    - WorldClim
-    - SoilGrids_pH
-    - SoilGrids_BulkDensity
-    - SoilGrids_ClayContent
-    - SoilGrids_SandContent
-    - SoilGrids_SiltContent
-    - SoilGrids_OrganicCarbon
+    - WORLDCLIM_BIO
+    - SOILGRIDS_PH
+    - SOILGRIDS_OC
+    - SOILGRIDS_TEXTURE
     - MODIS_NDVI
     - MODIS_EVI
-    - MODIS_LST
     - MODIS_LANDCOVER
     - SRTM
     - GBIF
-    - TerraClimate
-    - OpenAQ
-    # USGS_NWIS: very sparse (0.4% coverage)
-    # Google_Embeddings: handle separately (high-dimensional)
+    - TERRACLIMATE
+    - GOOGLE_EMBEDDINGS
+    # USGS_NWIS: very sparse (0.4% coverage), cleared from database
 
   exclude:  # Services to explicitly exclude
     - GPM_PRECIP  # Too slow (>10min per cluster)
@@ -108,10 +103,11 @@ phase3:
   pca_variance_explained: 0.90  # Keep PCs explaining 90% variance
 
   pca_by_domain:  # Apply PCA separately to variable families
-    climate: ["NASA_POWER", "WorldClim", "TerraClimate"]
-    soil: ["SoilGrids"]
-    vegetation: ["MODIS_NDVI", "MODIS_EVI", "MODIS_LST"]
-    # Google embeddings handled separately
+    climate: ["NASA_POWER", "WORLDCLIM_BIO", "TERRACLIMATE"]
+    soil: ["SOILGRIDS_PH", "SOILGRIDS_OC", "SOILGRIDS_TEXTURE"]
+    vegetation: ["MODIS_NDVI", "MODIS_EVI", "MODIS_LANDCOVER"]
+    embeddings: ["GOOGLE_EMBEDDINGS"]  # Already dimensionality-reduced (64D)
+    biodiversity: ["GBIF"]  # Species occurrences (high-dimensional taxstrings)
 
   core_variables:  # Always keep these (domain knowledge)
     - "SoilGrids_pH__pH_0-5cm"

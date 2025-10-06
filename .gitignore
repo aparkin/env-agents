@@ -319,6 +319,8 @@ pangenome_env_data/
 
 # Large data files (samples, clusters, results)
 notebooks/*.csv
+*.parquet
+analysis/data/phase1_outputs/*.parquet
 notebooks/*.tsv
 notebooks/*.ipynb
 !notebooks/env_agents_core_demo.ipynb

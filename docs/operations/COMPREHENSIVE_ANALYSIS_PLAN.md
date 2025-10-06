@@ -1,6 +1,14 @@
 # Comprehensive Analysis Plan: Environmental Predictors of Microbial Distribution
 
-**Goal:** Understand which environmental features determine where specific taxa are found, accounting for confounding relationships among environmental variables (e.g., C/N/pH correlations).
+**Status: COMPLETED (Null Result)** - October 6, 2025
+
+**Key Finding:** Global-scale environmental variables (climate, soil, vegetation, topography, embeddings) show **negligible predictive power** for bacterial taxonomy (mean AUC = 0.526, best = 0.590). This null result suggests environmental generalism or dispersal-driven community assembly at global scales.
+
+**See**: `analysis/PHASE2_RESULTS_SUMMARY.md` for detailed results.
+
+---
+
+**Original Goal:** Understand which environmental features determine where specific taxa are found, accounting for confounding relationships among environmental variables (e.g., C/N/pH correlations).
 
 **Critical Clarifications:**
 - **NOT abundance data:** Presence/absence only (genomes were isolated/assembled from these locations)
@@ -325,6 +333,177 @@ for env_var in env_vars:
 - Scatter: Top associations with LOESS smoothing
 
 **Script:** `07_univariate_screening.py`
+
+---
+
+## Phase 2.5: Embedding-Environment Correlation Analysis (Week 2-3)
+
+**Challenge:** Google Embeddings provide 64 learned features from satellite imagery. We need to understand their relationship to explicit environmental measurements before dimensionality reduction.
+
+**Critical Questions:**
+1. **Redundancy:** Which embedding dimensions are redundant with explicit measurements?
+2. **Novelty:** Which embeddings capture unique environmental information?
+3. **Information content:** How much predictive power is shared vs unique?
+
+### 2.5.1 Correlation Structure
+
+**Cross-correlation matrix:**
+```python
+# Separate embeddings from explicit environmental variables
+embedding_cols = [col for col in df.columns if 'GOOGLE_EMBEDDINGS' in col]
+explicit_env_cols = [col for col in df.columns if 'GOOGLE_EMBEDDINGS' not in col and 'GBIF' not in col]
+
+# Compute 64 × ~100 correlation matrix
+from scipy.stats import spearmanr
+corr_matrix = pd.DataFrame(index=embedding_cols, columns=explicit_env_cols)
+
+for emb in embedding_cols:
+    for env in explicit_env_cols:
+        rho, _ = spearmanr(df[emb], df[env], nan_policy='omit')
+        corr_matrix.loc[emb, env] = rho
+
+# Visualize
+sns.heatmap(corr_matrix, cmap='RdBu_r', center=0, vmin=-1, vmax=1)
+```
+
+**Expected patterns:**
+- Some embeddings strongly correlate with NDVI/EVI (vegetation structure)
+- Some correlate with temperature/elevation (thermal patterns)
+- Some correlate with soil properties (bare soil reflectance)
+- Some have low correlation with ALL explicit vars (novel information)
+
+### 2.5.2 Classify Embeddings
+
+**Identify redundant vs novel dimensions:**
+
+```python
+# For each embedding, find max absolute correlation with any explicit variable
+max_corr_per_embedding = corr_matrix.abs().max(axis=1)
+
+# Classify
+redundant = max_corr_per_embedding[max_corr_per_embedding > 0.7]  # High correlation
+novel = max_corr_per_embedding[max_corr_per_embedding < 0.3]      # Low correlation
+intermediate = max_corr_per_embedding[(max_corr_per_embedding >= 0.3) & (max_corr_per_embedding <= 0.7)]
+
+print(f"Redundant dimensions: {len(redundant)} (highly correlated with explicit vars)")
+print(f"Novel dimensions: {len(novel)} (capture unique information)")
+print(f"Intermediate: {len(intermediate)}")
+
+# Identify what each redundant embedding correlates with
+for emb in redundant.index:
+    best_match = corr_matrix.loc[emb].abs().idxmax()
+    r_value = corr_matrix.loc[emb, best_match]
+    print(f"  {emb}: r={r_value:.2f} with {best_match}")
+```
+
+**Interpretation:**
+- **Redundant embeddings:** Consider dropping or using as proxies for sparse explicit vars
+- **Novel embeddings:** Retain - may capture unmeasured gradients (e.g., landscape texture, microhabitat heterogeneity)
+- **Intermediate:** Case-by-case evaluation
+
+### 2.5.3 Canonical Correlation Analysis (CCA)
+
+**Find linear combinations maximally correlated:**
+
+```python
+from sklearn.cross_decomposition import CCA
+
+# Prepare standardized data
+X_embeddings = df[embedding_cols].fillna(0)  # 64 dimensions
+X_explicit = df[explicit_env_cols].fillna(df[explicit_env_cols].mean())  # ~100 variables
+
+# Fit CCA
+cca = CCA(n_components=10)
+X_emb_c, X_env_c = cca.fit_transform(X_embeddings, X_explicit)
+
+# Compute canonical correlations
+canonical_corrs = [np.corrcoef(X_emb_c[:, i], X_env_c[:, i])[0, 1] for i in range(10)]
+
+print("Canonical correlations:")
+for i, r in enumerate(canonical_corrs):
+    print(f"  CC{i+1}: {r:.3f}")
+
+# Visualize
+plt.plot(range(1, 11), canonical_corrs, 'o-')
+plt.xlabel('Canonical Component')
+plt.ylabel('Correlation')
+plt.title('Canonical Correlation Scree Plot')
+```
+
+**Interpretation:**
+- **High canonical correlations (>0.8):** Embeddings and explicit vars share strong structure
+- **Low canonical correlations (<0.5):** Embeddings capture orthogonal information
+
+### 2.5.4 Variance Partitioning
+
+**Quantify unique vs shared information:**
+
+**Method:** Use taxonomic response to test predictive power
+
+```python
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import cross_val_score
+
+# Example: Predict Acidobacteria presence
+y = df_taxonomy['Acidobacteriota_present']
+
+# Model A: Embeddings only
+model_emb = RandomForestClassifier(n_estimators=100, max_depth=10)
+score_emb = cross_val_score(model_emb, X_embeddings, y, cv=5, scoring='roc_auc').mean()
+
+# Model B: Explicit environmental vars only
+model_env = RandomForestClassifier(n_estimators=100, max_depth=10)
+score_env = cross_val_score(model_env, X_explicit, y, cv=5, scoring='roc_auc').mean()
+
+# Model C: Combined
+X_combined = pd.concat([X_embeddings, X_explicit], axis=1)
+model_combined = RandomForestClassifier(n_estimators=100, max_depth=10)
+score_combined = cross_val_score(model_combined, X_combined, y, cv=5, scoring='roc_auc').mean()
+
+# Partition variance
+shared = min(score_emb, score_env)
+unique_emb = score_combined - score_env
+unique_env = score_combined - score_emb
+
+print(f"Embeddings only:       AUC = {score_emb:.3f}")
+print(f"Explicit env only:     AUC = {score_env:.3f}")
+print(f"Combined:              AUC = {score_combined:.3f}")
+print(f"\nUnique to embeddings:  {unique_emb:.3f}")
+print(f"Unique to explicit:    {unique_env:.3f}")
+print(f"Shared:                {shared:.3f}")
+```
+
+**Visualization:** Venn diagram showing information overlap
+
+**Key Decisions Based on Results:**
+
+| Scenario | Interpretation | Action |
+|----------|----------------|--------|
+| High shared, low unique embedding | Embeddings redundant | Consider dropping embeddings |
+| High shared, high unique embedding | Complementary information | Use both in modeling |
+| Low shared, high unique embedding | Embeddings capture novel gradients | Prioritize embeddings |
+| High unique explicit | Explicit vars essential | Cannot rely on embeddings alone |
+
+### 2.5.5 Expected Outcomes
+
+**Hypothesis 1: Embeddings partially redundant**
+- Expect 20-30 of 64 dimensions correlate (r>0.5) with explicit vars
+- These likely capture: vegetation (NDVI proxy), temperature (thermal patterns), moisture (water bodies)
+
+**Hypothesis 2: Embeddings add unique information**
+- Expect 10-20 dimensions have low correlation (<0.3) with all explicit vars
+- These may capture: landscape texture, microhabitat heterogeneity, land use patterns not in categorical vars
+
+**Hypothesis 3: Combined model performs best**
+- Expect combined AUC > max(embedding-only, explicit-only) + 0.05
+- Indicates complementary information
+
+**Critical for Downstream Analysis:**
+- Informs PCA strategy: Should we PCA embeddings separately or jointly with explicit vars?
+- Guides feature selection: Retain novel embeddings, drop redundant ones
+- Validates embedding utility: Are they worth the acquisition cost?
+
+**Script:** `07b_embedding_environment_correlation.py`
 
 ---
 
@@ -1168,6 +1347,7 @@ from statsmodels.stats.multitest import multipletests  # Bonferroni correction
 |-------|----------|-----------------|
 | 1. Data Prep & QA | 2 weeks | Clean wide-format matrix |
 | 2. EDA | 1-2 weeks | Summary statistics, correlation structure |
+| 2.5. Embedding-Environment Analysis | 1 week | Embedding classification, CCA, variance partitioning |
 | 3. Dimensionality Reduction | 1 week | 50 composite features |
 | 4. Imputation | 1 week | Complete dataset with sensitivity checks |
 | 5. Modeling | 2-3 weeks | Trained CatBoost models with feature selection |
@@ -1175,7 +1355,7 @@ from statsmodels.stats.multitest import multipletests  # Bonferroni correction
 | 7. Interpretation | 1-2 weeks | Biological insights from SHAP/PDP |
 | 8. Reporting | 1-2 weeks | Manuscript-ready figures and tables |
 
-**Total:** 10-15 weeks (2.5-4 months)
+**Total:** 11-16 weeks (2.75-4 months)
 
 ---
 

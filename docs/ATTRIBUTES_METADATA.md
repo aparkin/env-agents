@@ -466,3 +466,105 @@ clear_sky = modis[modis['cloud_cover'] < 10]
 2. Maintain backward compatibility when possible
 3. Update example queries if attribute structure changes
 4. Consider migration script if breaking changes are needed
+
+---
+
+## Genome Sample Metadata
+
+### Environment Classification (`env_class`)
+
+**Purpose**: Distinguish samples from natural environments vs. human-modified settings for filtering analysis datasets.
+
+**Schema** (in `df_gtdb_tagged_cleaneed.tsv` and `genome_samples` table):
+```
+genome_id, lat, lon, env_class, env_tags, ...
+```
+
+**Classification Logic** (see `analysis/notebooks/01_data_prep/00_environment_classification.ipynb`):
+
+```python
+def classify_environment_osm(df, lat_col="lat", lon_col="lon", radius=100):
+    """
+    Classify coordinates using OpenStreetMap Overpass API.
+
+    Query detects:
+    - Buildings (node/way/relation[building])
+    - Universities (amenity=university)
+    - Industrial sites (industrial=*)
+
+    Within 100m radius of sample coordinates.
+    """
+```
+
+**Values**:
+- **`"free_environment"`**: No buildings, universities, or industrial sites within 100m
+  - Natural habitats (forests, grasslands, water bodies)
+  - Remote locations away from human infrastructure
+  - Agricultural fields (no buildings)
+
+- **`"other"`**: Human-modified environment detected
+  - Urban/suburban areas with buildings
+  - University campuses and research stations
+  - Industrial sites and factories
+  - Hospitals and labs (detected via building tags)
+
+- **`"error"`**: OSM API query failed (network timeout, invalid coordinates, etc.)
+
+**`env_tags` Field**: List of OpenStreetMap feature tags for detected structures (JSON-serialized).
+
+Example:
+```json
+[
+  {"building": "yes", "addr:city": "Berkeley", "name": "Stanley Hall"},
+  {"amenity": "university", "name": "University of California Berkeley"}
+]
+```
+
+**Use Cases**:
+
+1. **Filter to environmental samples only**:
+   ```python
+   df_natural = df[df['env_class'] == 'free_environment']
+   ```
+
+2. **Compare host-associated vs. environmental microbes**:
+   ```python
+   # Assuming host data also available
+   natural_microbes = df[df['env_class'] == 'free_environment']
+   host_associated = df[df['host_harmonized'].notna()]
+   ```
+
+3. **Exclude lab contaminants**:
+   ```python
+   # Exclude samples near universities/labs
+   field_samples = df[
+       (df['env_class'] == 'free_environment') |
+       (df['env_tags'].apply(lambda x: 'university' not in str(x)))
+   ]
+   ```
+
+4. **Analyze urbanization gradient**:
+   ```python
+   # Count nearby buildings as urbanization proxy
+   df['building_count'] = df['env_tags'].apply(
+       lambda x: sum(1 for tag in x if 'building' in tag)
+   )
+   ```
+
+**Data Quality Notes**:
+- Classification relies on OpenStreetMap completeness (varies by region)
+- Urban areas: high OSM coverage, reliable classification
+- Remote areas: lower OSM coverage, may miss small structures
+- 100m radius chosen to balance:
+  - **Sensitivity**: Detect nearby human activity
+  - **Specificity**: Avoid false positives from distant buildings
+
+**Processing Details**:
+- Unique coordinates queried once (deduplicated)
+- Results cached and mapped back to all genomes at that location
+- Total queries: ~40,000 unique locations (from 83,227 genomes)
+- Rate limited to respect OSM Overpass API limits (1 query/2 seconds)
+- Total processing time: ~22 hours
+
+**Source**: `notebooks/GTB Pangenome Environment Linkage.ipynb` (original, 89MB with outputs)
+**Clean version**: `analysis/notebooks/01_data_prep/00_environment_classification.ipynb` (outputs stripped)

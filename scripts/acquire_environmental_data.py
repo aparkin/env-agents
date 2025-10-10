@@ -19,6 +19,7 @@ import argparse
 import sys
 import time
 import sqlite3
+import json
 import logging
 from pathlib import Path
 from datetime import datetime
@@ -549,6 +550,16 @@ class EnvironmentalDataAcquisition:
 
         obs_data = []
         for idx, row in df.iterrows():
+            # Serialize attributes dict to JSON for database storage
+            # Preserves all service-specific metadata (taxonomy, QC flags, provenance, etc.)
+            attributes_json = None
+            if 'attributes' in row and row['attributes'] is not None:
+                try:
+                    attributes_json = json.dumps(row['attributes'])
+                except (TypeError, ValueError):
+                    # If attributes can't be serialized, store None
+                    attributes_json = None
+
             obs_data.append((
                 row.get('observation_id'),
                 cluster_id,
@@ -558,13 +569,14 @@ class EnvironmentalDataAcquisition:
                 row.get('unit'),
                 row.get('time'),
                 row.get('latitude'),
-                row.get('longitude')
+                row.get('longitude'),
+                attributes_json
             ))
 
         conn.executemany("""
         INSERT OR REPLACE INTO env_observations
-        (obs_id, cluster_id, service_name, variable, value, unit, time_stamp, lat, lon)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        (obs_id, cluster_id, service_name, variable, value, unit, time_stamp, lat, lon, attributes)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, obs_data)
 
         conn.commit()

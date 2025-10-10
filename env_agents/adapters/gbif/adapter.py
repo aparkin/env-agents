@@ -290,33 +290,41 @@ class GBIFAdapter(BaseAdapter, StandardAdapterMixin):
     def capabilities(self) -> Dict[str, Any]:
         """
         Return comprehensive capabilities following Earth Engine gold standard.
-        
+
         Provides detailed metadata about GBIF data availability, coverage,
         and quality characteristics with research-grade documentation.
+
+        Variables are now taxonomic strings preserving full hierarchy from
+        domain to species, enabling species-level biodiversity analysis.
         """
         web_enhanced = self.scrape_gbif_documentation()
-        variables = self.get_enhanced_taxonomy_metadata()
-        
+
         return {
             "dataset": self.DATASET,
             "asset_type": "biodiversity_occurrence_database",
             "enhancement_level": "earth_engine_gold_standard",
-            
+
             "variables": [
                 {
-                    "name": var["name"],
-                    "code": var["code"],
-                    "description": var["description"],
-                    "units": var["units"],
-                    "valid_range": var.get("valid_range"),
-                    "kingdom": var.get("kingdom"),
-                    "ecological_significance": var.get("ecological_significance"),
-                    "conservation_applications": var.get("conservation_applications", []),
-                    "temporal_patterns": var.get("temporal_patterns"),
-                    "interpretation": var.get("interpretation", {}),
+                    "name": "taxonomic_occurrence_string",
+                    "description": """Species occurrence records encoded as structured taxonomic strings.
+                    Format: d_{domain};k_{kingdom};p_{phylum};c_{class};o_{order};f_{family};g_{genus};s_{species}
+                    Example: 'd_Eukaryota;k_Animalia;p_Chordata;c_Aves;o_Passeriformes;f_Corvidae;g_Corvus;s_Corvus_corax'
+                    Missing levels are encoded as 'unknown' to maintain consistent structure.
+                    This approach preserves full taxonomic hierarchy while avoiding data loss from kingdom-level aggregation.""",
+                    "units": "count (presence = 1)",
+                    "valid_range": [1, 1],
+                    "ecological_significance": "Species-level occurrence data for biodiversity analysis",
+                    "conservation_applications": [
+                        "Species distribution mapping",
+                        "Biodiversity hotspot identification",
+                        "Conservation area effectiveness",
+                        "Taxonomic group analysis at any level (kingdom through species)"
+                    ],
+                    "temporal_patterns": "Event-based observations varying with sampling effort",
+                    "variable_count": "Dynamic - each unique taxon generates a unique variable",
                     "metadata_completeness": 0.95
                 }
-                for var in variables
             ],
             
             "temporal_coverage": {
@@ -478,23 +486,26 @@ class GBIFAdapter(BaseAdapter, StandardAdapterMixin):
             retrieval_timestamp = datetime.now(timezone.utc).isoformat()
             
             for record in data['results']:
-                # Determine variable type based on kingdom
-                kingdom = record.get('kingdom', '')
-                if kingdom == 'Animalia':
-                    variable_name = "Animal Occurrences"
-                elif kingdom == 'Plantae':
-                    variable_name = "Plant Occurrences"
-                elif kingdom == 'Fungi':
-                    variable_name = "Fungi Occurrences"
-                else:
-                    variable_name = "Species Occurrences"
-                
-                # Find variable metadata
-                var_meta = next(
-                    (v for v in self.get_enhanced_taxonomy_metadata() 
-                     if v["name"] == variable_name),
-                    {"name": variable_name, "units": "count"}
+                # Create structured taxonomic string instead of collapsing to kingdom
+                # Format: d_{domain};k_{kingdom};p_{phylum};c_{class};o_{order};f_{family};g_{genus};s_{species}
+                # Use "unknown" for missing levels to maintain consistent structure
+                domain = record.get('domain', 'unknown')  # GBIF sometimes has this
+                kingdom = record.get('kingdom', 'unknown')
+                phylum = record.get('phylum', 'unknown')
+                class_ = record.get('class', 'unknown')
+                order = record.get('order', 'unknown')
+                family = record.get('family', 'unknown')
+                genus = record.get('genus', 'unknown')
+                species = record.get('species', 'unknown')
+
+                # Build taxstring - preserves full taxonomic hierarchy
+                variable_name = (
+                    f"d_{domain};k_{kingdom};p_{phylum};c_{class_};"
+                    f"o_{order};f_{family};g_{genus};s_{species}"
                 )
+
+                # Use generic metadata for occurrence counts
+                var_meta = {"name": variable_name, "units": "count"}
                 
                 row = {
                     # Identity columns

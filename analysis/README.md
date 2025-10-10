@@ -43,7 +43,10 @@ python scripts/phase1_data_prep.py
 jupyter notebook notebooks/01_data_prep/
 ```
 
-Start with `01a_extract_pivot.ipynb`
+**Notebooks in order:**
+1. `00_environment_classification.ipynb` - Classify samples as "free_environment" vs "other" using OpenStreetMap
+2. `01a_extract_pivot.ipynb` - Extract and pivot environmental data
+3. `01b_environmental_gradients.ipynb` - Explore environmental variable distributions
 
 ### 4. Check outputs
 
@@ -80,6 +83,9 @@ analysis/
 ├── notebooks/                   # Interactive exploration
 │   ├── 00_dashboard.ipynb      # Quick overview of results
 │   ├── 01_data_prep/           # Phase 1 notebooks
+│   │   ├── 00_environment_classification.ipynb  # OSM-based env classification
+│   │   ├── 01a_extract_pivot.ipynb             # Extract & pivot data
+│   │   └── 01b_environmental_gradients.ipynb   # EDA of env variables
 │   ├── 02_eda/                 # Phase 2 notebooks
 │   └── ...                     # Phases 3-8
 │
@@ -224,10 +230,11 @@ Tests check:
 *This section will be updated as analysis progresses*
 
 ### Phase 1: Data Preparation
-- [ ] Clusters: 4,789
-- [ ] Environmental variables: 180
-- [ ] Missing data pattern: ...
-- [ ] Excluded services: GPM_PRECIP (too slow)
+- [x] Environment classification: 83,227 genomes (OSM-based free_environment detection)
+- [x] Clusters: 4,789 (DBSCAN spatial clustering)
+- [x] Environmental variables: 311 (247 explicit + 64 embeddings)
+- [x] Missing data pattern: Median 70% completeness per variable
+- [x] Data extraction complete: 16 services (Phase 2 analysis completed)
 
 ### Phase 5: Modeling
 - [ ] Top environmental predictors: ...

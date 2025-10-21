@@ -4,6 +4,9 @@ Lean Production Earth Engine Adapter
 Simple, fast adapter for production data acquisition.
 No web scraping, no visualization, no unnecessary metadata.
 Just: authenticate once, query EE, return data.
+
+Grid Sampling: Returns multiple spatially-distributed samples within
+bounding boxes to capture environmental gradients.
 """
 
 import logging
@@ -16,6 +19,11 @@ import threading
 from ..base import BaseAdapter
 from ...core.models import RequestSpec
 from ...core.config import get_config
+from .spatial_sampling import (
+    calculate_sample_count,
+    generate_sample_grid,
+    should_use_grid_sampling
+)
 
 logger = logging.getLogger(__name__)
 
@@ -230,16 +238,33 @@ class ProductionEarthEngineAdapter(BaseAdapter):
 
         # Query based on asset type
         if asset_type == "ImageCollection":
-            return self._query_image_collection(region, bbox, center_lat, center_lon, start_date, end_date)
+            return self._query_image_collection(region, bbox, center_lat, center_lon, start_date, end_date, spec)
         else:
-            return self._query_image(region, bbox, center_lat, center_lon, start_date)
+            return self._query_image(region, bbox, center_lat, center_lon, start_date, spec)
 
-    def _query_image(self, region, bbox: list, center_lat: float, center_lon: float, date: str) -> List[Dict]:
-        """Query single Image asset"""
+    def _query_image(self, region, bbox: list, center_lat: float, center_lon: float, date: str, spec: RequestSpec) -> List[Dict]:
+        """
+        Query single Image asset with grid sampling support.
+
+        Returns multiple samples within bbox to capture spatial gradients
+        instead of single aggregated value.
+        """
         img = ee.Image(self.asset_id).clip(region)
 
-        # Use modest maxPixels for speed (not 1e13!)
-        # Wrap getInfo() with timeout to prevent hanging
+        # Determine if we should use grid sampling
+        use_grid = should_use_grid_sampling(spec, default_enabled=True)
+
+        if not use_grid:
+            # Legacy behavior: single aggregated value
+            return self._query_image_aggregated(img, bbox, center_lat, center_lon, date)
+
+        # Grid sampling: multiple samples to capture gradients
+        return self._query_image_grid(img, bbox, date, spec)
+
+    def _query_image_aggregated(self, img, bbox: list, center_lat: float, center_lon: float, date: str) -> List[Dict]:
+        """Query image with aggregation (legacy behavior for resolution='low')"""
+        region = ee.Geometry.Rectangle(bbox)
+
         def get_stats():
             return img.reduceRegion(
                 reducer=ee.Reducer.mean(),
@@ -253,7 +278,7 @@ class ProductionEarthEngineAdapter(BaseAdapter):
         except TimeoutError as e:
             raise Exception(f"Earth Engine timeout: {e}") from e
 
-        # Build WKT from bbox we already have (no .getInfo() needed!)
+        # Build WKT
         minlon, minlat, maxlon, maxlat = bbox
         wkt = f"POLYGON(({minlon} {minlat}, {maxlon} {minlat}, {maxlon} {maxlat}, {minlon} {maxlat}, {minlon} {minlat}))"
 
@@ -279,15 +304,89 @@ class ProductionEarthEngineAdapter(BaseAdapter):
                     "qc_flag": "ok",
                     "attributes": {
                         "asset_id": self.asset_id,
-                        "scale_m": self.scale
+                        "scale_m": self.scale,
+                        "spatial_aggregation": {
+                            "method": "mean",
+                            "bbox": bbox,
+                            "n_samples": 1
+                        }
                     }
                 })
 
         return rows
 
+    def _query_image_grid(self, img, bbox: list, date: str, spec: RequestSpec) -> List[Dict]:
+        """Query image at multiple grid points to capture spatial gradients"""
+        # Calculate appropriate sample count
+        max_samples = spec.extra.get("max_samples", 100) if spec.extra else 100
+        n_samples, n_side, sampling_metadata = calculate_sample_count(
+            bbox, self.scale, spec.resolution, max_samples
+        )
+
+        # Generate sample points
+        sample_points = generate_sample_grid(bbox, n_side)
+
+        # Query each sample point
+        rows = []
+        for i, (lat, lon) in enumerate(sample_points):
+            point = ee.Geometry.Point([lon, lat])
+
+            # Sample at this point
+            def get_sample():
+                return img.reduceRegion(
+                    reducer=ee.Reducer.first(),  # Get pixel value at point
+                    geometry=point,
+                    scale=self.scale,
+                    maxPixels=1
+                ).getInfo()
+
+            try:
+                values = run_with_timeout(get_sample, timeout_sec=30)
+            except TimeoutError:
+                logger.warning(f"Timeout sampling point {i+1}/{n_samples} at ({lat:.4f}, {lon:.4f})")
+                continue
+            except Exception as e:
+                logger.warning(f"Error sampling point {i+1}/{n_samples}: {e}")
+                continue
+
+            # Create row for each variable at this location
+            for variable, value in values.items():
+                if value is not None:
+                    rows.append({
+                        "observation_id": f"ee_{self.asset_id.replace('/', '_')}_{date}_{variable}_{i}",
+                        "dataset": self.DATASET,
+                        "source_url": self.SOURCE_URL,
+                        "source_version": self.SOURCE_VERSION,
+                        "license": self.LICENSE,
+                        "retrieval_timestamp": datetime.now(),
+                        "geometry_type": "point",
+                        "latitude": lat,
+                        "longitude": lon,
+                        "geom_wkt": f"POINT({lon} {lat})",
+                        "time": date,
+                        "variable": f"ee:{variable}",
+                        "value": float(value),
+                        "unit": "",
+                        "qc_flag": "ok",
+                        "attributes": {
+                            "asset_id": self.asset_id,
+                            "scale_m": self.scale,
+                            "spatial_sampling": sampling_metadata,
+                            "sample_index": i,
+                            "grid_position": f"{i // n_side},{i % n_side}"
+                        }
+                    })
+
+        return rows
+
     def _query_image_collection(self, region, bbox: list, center_lat: float, center_lon: float,
-                                start_date: str, end_date: str) -> List[Dict]:
-        """Query ImageCollection asset with automatic temporal fallback"""
+                                start_date: str, end_date: str, spec: RequestSpec) -> List[Dict]:
+        """
+        Query ImageCollection asset with automatic temporal fallback.
+
+        Note: Grid sampling for ImageCollections not yet implemented (returns aggregated values).
+        This is due to complexity of sampling both spatial and temporal dimensions.
+        """
 
         # Store original requested dates for metadata
         requested_start = start_date

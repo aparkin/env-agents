@@ -337,7 +337,7 @@ class ProductionEarthEngineAdapter(BaseAdapter):
                     reducer=ee.Reducer.first(),  # Get pixel value at point
                     geometry=point,
                     scale=self.scale,
-                    maxPixels=1
+                    bestEffort=True  # Allow EE to use appropriate pixel count
                 ).getInfo()
 
             try:
@@ -382,10 +382,32 @@ class ProductionEarthEngineAdapter(BaseAdapter):
     def _query_image_collection(self, region, bbox: list, center_lat: float, center_lon: float,
                                 start_date: str, end_date: str, spec: RequestSpec) -> List[Dict]:
         """
-        Query ImageCollection asset with automatic temporal fallback.
+        Query ImageCollection asset with grid sampling support.
 
-        Note: Grid sampling for ImageCollections not yet implemented (returns aggregated values).
-        This is due to complexity of sampling both spatial and temporal dimensions.
+        Supports both aggregated (legacy) and grid sampling modes based on spec.resolution.
+        Grid sampling captures spatial gradients at each time step.
+        """
+
+        # Determine if we should use grid sampling
+        use_grid = should_use_grid_sampling(spec, default_enabled=True)
+
+        if not use_grid:
+            # Legacy behavior: single aggregated value per time step
+            return self._query_image_collection_aggregated(
+                region, bbox, center_lat, center_lon, start_date, end_date, spec
+            )
+
+        # Grid sampling: multiple spatial samples per time step
+        return self._query_image_collection_grid(
+            region, bbox, start_date, end_date, spec
+        )
+
+    def _query_image_collection_aggregated(self, region, bbox: list, center_lat: float, center_lon: float,
+                                          start_date: str, end_date: str, spec: RequestSpec) -> List[Dict]:
+        """
+        Query ImageCollection with aggregation (legacy behavior for resolution='low').
+
+        Returns single aggregated value at bbox centroid for each time step.
         """
 
         # Store original requested dates for metadata
@@ -555,6 +577,191 @@ class ProductionEarthEngineAdapter(BaseAdapter):
                             "attributes": attributes
                         })
 
+        return rows
+
+    def _query_image_collection_grid(self, region, bbox: list, start_date: str, end_date: str,
+                                     spec: RequestSpec) -> List[Dict]:
+        """
+        Query ImageCollection at multiple grid points to capture spatial gradients.
+
+        For each time step, samples at multiple spatial locations within the bbox.
+        Returns: N_time_steps × N_spatial_samples rows.
+        """
+
+        # Store original requested dates for metadata
+        requested_start = start_date
+        requested_end = end_date
+        fallback_applied = False
+        fallback_reason = None
+
+        # First attempt: try requested date range
+        ic = ee.ImageCollection(self.asset_id).filterDate(start_date, end_date).filterBounds(region)
+
+        # Check if we have any images
+        def check_size():
+            return ic.size().getInfo()
+
+        try:
+            count = run_with_timeout(check_size, timeout_sec=30)
+        except TimeoutError as e:
+            raise Exception(f"Earth Engine timeout (checking image count): {e}") from e
+
+        # If no images found, try temporal fallback (same logic as aggregated method)
+        if count == 0:
+            logger.warning(f"No images found for {self.asset_id} in {start_date} to {end_date}, attempting temporal fallback")
+            fallback_applied = True
+
+            # Get collection's actual date range
+            full_collection = ee.ImageCollection(self.asset_id).filterBounds(region)
+
+            def get_date_range():
+                dates = full_collection.aggregate_array('system:time_start').getInfo()
+                if not dates:
+                    return None, None
+                import datetime
+                min_ts = min(dates)
+                max_ts = max(dates)
+                min_date = datetime.datetime.fromtimestamp(min_ts / 1000).strftime('%Y-%m-%d')
+                max_date = datetime.datetime.fromtimestamp(max_ts / 1000).strftime('%Y-%m-%d')
+                return min_date, max_date
+
+            try:
+                available_start, available_end = run_with_timeout(get_date_range, timeout_sec=30)
+            except TimeoutError as e:
+                raise Exception(f"Earth Engine timeout (getting date range): {e}") from e
+
+            if not available_start or not available_end:
+                logger.warning(f"No images found for {self.asset_id} at this location")
+                return []
+
+            # Apply temporal fallback logic
+            if requested_start > available_end:
+                fallback_reason = f"requested_date_{requested_start}_after_dataset_end_{available_end}"
+                end_year = available_end[:4]
+                start_date = f"{end_year}-01-01"
+                end_date = f"{end_year}-12-31"
+                logger.info(f"Falling back to most recent year: {start_date} to {end_date}")
+            elif requested_end < available_start:
+                fallback_reason = f"requested_date_{requested_end}_before_dataset_start_{available_start}"
+                start_year = available_start[:4]
+                start_date = f"{start_year}-01-01"
+                end_date = f"{start_year}-12-31"
+                logger.info(f"Falling back to oldest year: {start_date} to {end_date}")
+            else:
+                fallback_reason = f"no_data_in_requested_range_using_available_{available_start}_to_{available_end}"
+                start_date = available_start
+                end_date = available_end
+                logger.info(f"Using full available range: {start_date} to {end_date}")
+
+            # Re-filter with fallback dates
+            ic = ee.ImageCollection(self.asset_id).filterDate(start_date, end_date).filterBounds(region)
+
+            # Check again
+            try:
+                count = run_with_timeout(check_size, timeout_sec=30)
+            except TimeoutError as e:
+                raise Exception(f"Earth Engine timeout (checking fallback count): {e}") from e
+
+            if count == 0:
+                logger.warning(f"No images found even after fallback for {self.asset_id}")
+                return []
+
+        # Calculate appropriate sample count and generate grid
+        max_samples = spec.extra.get("max_samples", 100) if spec.extra else 100
+        n_samples, n_side, sampling_metadata = calculate_sample_count(
+            bbox, self.scale, spec.resolution, max_samples
+        )
+
+        # Generate sample points
+        sample_points = generate_sample_grid(bbox, n_side)
+
+        logger.info(f"Grid sampling ImageCollection: {n_samples} spatial points × {count} time steps")
+
+        # Get list of images with dates
+        def get_image_list():
+            return ic.toList(ic.size()).getInfo()
+
+        try:
+            image_list = run_with_timeout(get_image_list, timeout_sec=60)
+        except TimeoutError as e:
+            raise Exception(f"Earth Engine timeout (fetching image list): {e}") from e
+
+        rows = []
+
+        # For each image in the time series
+        for img_idx, img_info in enumerate(image_list):
+            img = ee.Image(img_info['id'])
+
+            # Get date from image
+            def get_date():
+                return ee.Date(img.get('system:time_start')).format('YYYY-MM-dd').getInfo()
+
+            try:
+                date = run_with_timeout(get_date, timeout_sec=20)
+            except TimeoutError:
+                logger.warning(f"Timeout getting date for image {img_idx}, skipping")
+                continue
+
+            # Sample at each grid point for this time step
+            for spatial_idx, (lat, lon) in enumerate(sample_points):
+                point = ee.Geometry.Point([lon, lat])
+
+                # Sample at this point
+                def get_sample():
+                    return img.reduceRegion(
+                        reducer=ee.Reducer.first(),  # Get pixel value at point
+                        geometry=point,
+                        scale=self.scale,
+                        bestEffort=True  # Allow EE to use appropriate pixel count
+                    ).getInfo()
+
+                try:
+                    values = run_with_timeout(get_sample, timeout_sec=30)
+                except TimeoutError:
+                    logger.warning(f"Timeout sampling point {spatial_idx} for date {date}, skipping")
+                    continue
+
+                # Create row for each variable at this location and time
+                for variable, value in values.items():
+                    if value is not None:
+                        # Build attributes with both spatial and temporal metadata
+                        attributes = {
+                            "asset_id": self.asset_id,
+                            "scale_m": self.scale,
+                            "spatial_sampling": sampling_metadata,
+                            "sample_index": spatial_idx,
+                            "grid_position": f"{spatial_idx // n_side},{spatial_idx % n_side}",
+                            "requested_date_range": f"{requested_start}_to_{requested_end}",
+                            "actual_date_range": f"{start_date}_to_{end_date}"
+                        }
+
+                        # Add fallback metadata if applicable
+                        if fallback_applied:
+                            attributes["temporal_fallback_applied"] = True
+                            attributes["temporal_fallback_reason"] = fallback_reason
+                        else:
+                            attributes["temporal_fallback_applied"] = False
+
+                        rows.append({
+                            "observation_id": f"ee_{self.asset_id.replace('/', '_')}_{date}_{variable}_{spatial_idx}",
+                            "dataset": self.DATASET,
+                            "source_url": self.SOURCE_URL,
+                            "source_version": self.SOURCE_VERSION,
+                            "license": self.LICENSE,
+                            "retrieval_timestamp": datetime.now(),
+                            "geometry_type": "point",
+                            "latitude": lat,
+                            "longitude": lon,
+                            "geom_wkt": f"POINT({lon} {lat})",
+                            "time": date,
+                            "variable": f"ee:{variable}",
+                            "value": float(value),
+                            "unit": "",
+                            "qc_flag": "ok",
+                            "attributes": attributes
+                        })
+
+        logger.info(f"Grid sampling complete: {len(rows)} total observations")
         return rows
 
     def capabilities(self) -> Dict[str, Any]:

@@ -437,15 +437,16 @@ class ProductionEarthEngineAdapter(BaseAdapter):
             full_collection = ee.ImageCollection(self.asset_id).filterBounds(region)
 
             def get_date_range():
-                dates = full_collection.aggregate_array('system:time_start').getInfo()
-                if not dates:
+                # Efficient approach: get first and last image instead of all timestamps
+                first_img = full_collection.sort('system:time_start').first()
+                last_img = full_collection.sort('system:time_start', False).first()
+
+                try:
+                    first_date = ee.Date(first_img.get('system:time_start')).format('YYYY-MM-dd').getInfo()
+                    last_date = ee.Date(last_img.get('system:time_start')).format('YYYY-MM-dd').getInfo()
+                    return first_date, last_date
+                except Exception:
                     return None, None
-                import datetime
-                min_ts = min(dates)
-                max_ts = max(dates)
-                min_date = datetime.datetime.fromtimestamp(min_ts / 1000).strftime('%Y-%m-%d')
-                max_date = datetime.datetime.fromtimestamp(max_ts / 1000).strftime('%Y-%m-%d')
-                return min_date, max_date
 
             try:
                 available_start, available_end = run_with_timeout(get_date_range, timeout_sec=30)
@@ -615,15 +616,16 @@ class ProductionEarthEngineAdapter(BaseAdapter):
             full_collection = ee.ImageCollection(self.asset_id).filterBounds(region)
 
             def get_date_range():
-                dates = full_collection.aggregate_array('system:time_start').getInfo()
-                if not dates:
+                # Efficient approach: get first and last image instead of all timestamps
+                first_img = full_collection.sort('system:time_start').first()
+                last_img = full_collection.sort('system:time_start', False).first()
+
+                try:
+                    first_date = ee.Date(first_img.get('system:time_start')).format('YYYY-MM-dd').getInfo()
+                    last_date = ee.Date(last_img.get('system:time_start')).format('YYYY-MM-dd').getInfo()
+                    return first_date, last_date
+                except Exception:
                     return None, None
-                import datetime
-                min_ts = min(dates)
-                max_ts = max(dates)
-                min_date = datetime.datetime.fromtimestamp(min_ts / 1000).strftime('%Y-%m-%d')
-                max_date = datetime.datetime.fromtimestamp(max_ts / 1000).strftime('%Y-%m-%d')
-                return min_date, max_date
 
             try:
                 available_start, available_end = run_with_timeout(get_date_range, timeout_sec=30)
@@ -675,54 +677,67 @@ class ProductionEarthEngineAdapter(BaseAdapter):
         # Generate sample points
         sample_points = generate_sample_grid(bbox, n_side)
 
-        logger.info(f"Grid sampling ImageCollection: {n_samples} spatial points × {count} time steps")
+        logger.info(f"Grid sampling ImageCollection (server-side batching): {n_samples} spatial points × {count} time steps")
 
-        # Get list of images with dates
-        def get_image_list():
-            return ic.toList(ic.size()).getInfo()
+        # Create FeatureCollection from grid points for server-side processing
+        features = []
+        for spatial_idx, (lat, lon) in enumerate(sample_points):
+            features.append(
+                ee.Feature(
+                    ee.Geometry.Point([lon, lat]),
+                    {
+                        'lat': lat,
+                        'lon': lon,
+                        'spatial_idx': spatial_idx,
+                        'grid_position': f"{spatial_idx // n_side},{spatial_idx % n_side}"
+                    }
+                )
+            )
+        points_fc = ee.FeatureCollection(features)
+
+        # Sample all points across all images using server-side operations
+        def sample_image(img):
+            """Sample all grid points for a single image"""
+            return img.sampleRegions(
+                collection=points_fc,
+                scale=self.scale,
+                geometries=True
+            ).map(lambda f: f.set({
+                'time': img.date().format('YYYY-MM-dd'),
+                'system_time_start': img.get('system:time_start')
+            }))
+
+        # Map across all images and flatten to single FeatureCollection
+        all_samples_fc = ic.map(sample_image).flatten()
+
+        # Single API call to fetch all samples
+        def get_all_samples():
+            return all_samples_fc.getInfo()
 
         try:
-            image_list = run_with_timeout(get_image_list, timeout_sec=60)
+            all_samples = run_with_timeout(get_all_samples, timeout_sec=300)  # 5 min timeout for large queries
         except TimeoutError as e:
-            raise Exception(f"Earth Engine timeout (fetching image list): {e}") from e
+            raise Exception(f"Earth Engine timeout (fetching grid samples): {e}") from e
 
+        # Transform FeatureCollection to rows format
         rows = []
+        if 'features' in all_samples:
+            for feature in all_samples['features']:
+                props = feature['properties']
 
-        # For each image in the time series
-        for img_idx, img_info in enumerate(image_list):
-            img = ee.Image(img_info['id'])
+                # Extract coordinates and metadata
+                lat = props.get('lat')
+                lon = props.get('lon')
+                spatial_idx = props.get('spatial_idx')
+                grid_pos = props.get('grid_position')
+                date = props.get('time')
 
-            # Get date from image
-            def get_date():
-                return ee.Date(img.get('system:time_start')).format('YYYY-MM-dd').getInfo()
+                # Create row for each variable
+                for variable, value in props.items():
+                    # Skip metadata fields
+                    if variable in ['lat', 'lon', 'spatial_idx', 'grid_position', 'time', 'system_time_start']:
+                        continue
 
-            try:
-                date = run_with_timeout(get_date, timeout_sec=20)
-            except TimeoutError:
-                logger.warning(f"Timeout getting date for image {img_idx}, skipping")
-                continue
-
-            # Sample at each grid point for this time step
-            for spatial_idx, (lat, lon) in enumerate(sample_points):
-                point = ee.Geometry.Point([lon, lat])
-
-                # Sample at this point
-                def get_sample():
-                    return img.reduceRegion(
-                        reducer=ee.Reducer.first(),  # Get pixel value at point
-                        geometry=point,
-                        scale=self.scale,
-                        bestEffort=True  # Allow EE to use appropriate pixel count
-                    ).getInfo()
-
-                try:
-                    values = run_with_timeout(get_sample, timeout_sec=30)
-                except TimeoutError:
-                    logger.warning(f"Timeout sampling point {spatial_idx} for date {date}, skipping")
-                    continue
-
-                # Create row for each variable at this location and time
-                for variable, value in values.items():
                     if value is not None:
                         # Build attributes with both spatial and temporal metadata
                         attributes = {
@@ -730,9 +745,10 @@ class ProductionEarthEngineAdapter(BaseAdapter):
                             "scale_m": self.scale,
                             "spatial_sampling": sampling_metadata,
                             "sample_index": spatial_idx,
-                            "grid_position": f"{spatial_idx // n_side},{spatial_idx % n_side}",
+                            "grid_position": grid_pos,
                             "requested_date_range": f"{requested_start}_to_{requested_end}",
-                            "actual_date_range": f"{start_date}_to_{end_date}"
+                            "actual_date_range": f"{start_date}_to_{end_date}",
+                            "sampling_method": "server_side_batch"
                         }
 
                         # Add fallback metadata if applicable
@@ -761,7 +777,7 @@ class ProductionEarthEngineAdapter(BaseAdapter):
                             "attributes": attributes
                         })
 
-        logger.info(f"Grid sampling complete: {len(rows)} total observations")
+        logger.info(f"Grid sampling complete (server-side batch): {len(rows)} total observations")
         return rows
 
     def capabilities(self) -> Dict[str, Any]:

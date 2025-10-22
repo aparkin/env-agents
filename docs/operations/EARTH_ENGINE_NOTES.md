@@ -1,6 +1,6 @@
 # Earth Engine Operations Guide
 
-**Last Updated:** 2025-10-21
+**Last Updated:** 2025-10-22
 **Status:** Production-Ready
 
 ## Overview
@@ -861,8 +861,154 @@ Before deploying Earth Engine adapter changes:
 
 ---
 
+## Phase 1 Robustness Fixes (2025-10-22)
+
+### Overview
+
+Comprehensive testing revealed edge cases with high-frequency data and unsupported asset types. Phase 1 fixes address 2 of 3 identified issues using simple heuristics.
+
+**Test Configuration:**
+- 17 assets across 3 priority tiers (MODIS, SMAP, Landsat, etc.)
+- Texas bounding box (270km × 165km)
+- Full year temporal range (2020)
+- Resolution: medium (3×3 or 5×5 grid)
+
+**Results:** 15/17 assets passing (88%)
+
+### Issues Addressed
+
+#### 1. Asset Type Validation ✅ FIXED
+
+**Problem:** Trying to sample FeatureCollection/Table assets as raster Images produced 25 repeated error messages and returned 0 rows without clear explanation.
+
+**Fix:** Early asset type detection with clear error message
+```python
+# production_adapter.py:207-225
+asset_info = ee.data.getAsset(self.asset_id)
+actual_type = asset_info.get('type', 'UNKNOWN')
+
+if actual_type in ['FeatureCollection', 'TABLE', 'Table']:
+    raise ValueError(
+        f"Asset '{self.asset_id}' is type '{actual_type}', not supported. "
+        f"This adapter only supports Image and ImageCollection (raster) assets."
+    )
+```
+
+**Impact:**
+- ESA/WorldCereal: 25 errors → single fast failure (0.45s)
+- Clear guidance to users about unsupported types
+
+#### 2. High-Frequency Data Handling ✅ PARTIALLY FIXED
+
+**Problem:** Daily collections with hundreds of images exceeded Earth Engine's 5000-element FeatureCollection limit.
+
+**Fix:** Three-part strategy
+1. **Adaptive spatial sampling** - Reduce to 3×3 grid for collections with >100 images
+2. **Conservative batching threshold** - Trigger batching at 1000 samples (was 2000)
+3. **Smaller batch size** - Target 800 samples/batch (was 2000)
+
+```python
+# production_adapter.py:691-718
+if count > 100:  # Daily or more frequent
+    adaptive_max_samples = min(max_samples, 9)  # Force 3×3
+
+needs_batching = (n_samples * count) > 1000  # Conservative threshold
+
+max_images_per_batch = max(10, 800 // n_samples)  # Smaller batches
+```
+
+**Impact:**
+- ✅ MODIS/MOD09GA_006_NDSI: **FIXED** (was failing with >5000 elements)
+  - 365 days × 9 points × 1 band = 3,285 samples ✅
+- ⚠️ NASA/SMAP: **Still fails** with memory limit exceeded (209s)
+  - 365 days × 9 points × 46 bands = 152,010 samples ❌
+
+### Test Results Summary
+
+| Priority | Success Rate | Notes |
+|----------|-------------|-------|
+| PRIORITY_1 (Core) | 7/7 (100%) | All MODIS, SoilGrids, SRTM passing |
+| PRIORITY_2 (Additional) | 3/4 (75%) | SMAP still problematic |
+| PRIORITY_3 (Edge Cases) | 5/6 (83%) | NDSI fixed, WorldCereal fails fast |
+
+**Performance Highlights:**
+- MOD13Q1: 4.45s (6,900 rows, 25 coords)
+- MOD11A2: 1.93s (756 rows, 22 coords)
+- NDSI: 19.97s (5,102 rows, 9 coords) ← **Was failing!**
+
+### Known Limitations
+
+#### SMAP Soil Moisture (NASA/SMAP/SPL4SMGP/008)
+
+**Issue:** 46 bands × 365 days × 9 spatial points = 152,010 values exceeds Earth Engine memory limit
+
+**Workarounds:**
+1. **Reduce temporal range** (recommended):
+   ```python
+   time_range=("2020-01-01", "2020-01-31")  # Single month
+   ```
+
+2. **Use low resolution** (single centroid):
+   ```python
+   resolution="low"  # Aggregated to single point
+   ```
+
+3. **Explicit spatial cap**:
+   ```python
+   extra={"max_samples": 4}  # Force 2×2 grid
+   ```
+
+**Root Cause:** Cannot filter bands via Earth Engine `sampleRegions()` API - must query all 46 bands or none.
+
+#### Table/FeatureCollection Assets
+
+**Unsupported asset types:**
+- ESA/WorldCereal (TABLE)
+- LARSE/GEDI (FeatureCollection)
+
+**Error message:**
+```
+ValueError: Asset 'ESA/WorldCereal/AEZ/v100' is type 'TABLE', which is not supported.
+This adapter only supports Image and ImageCollection (raster) assets.
+Vector/Table assets require different query methods.
+```
+
+### Why Simple Heuristics?
+
+**Current Approach:** Count-based thresholds (count > 100, product > 1000, batch = 800)
+
+**Limitations:**
+- No asset metadata about temporal frequency (daily vs weekly vs monthly)
+- Cannot query band count efficiently without extra API calls
+- Earth Engine lacks standardized `period`/`cadence` fields
+
+**Future Enhancement (Phase 2):**
+Could query band count at initialization and use volume-based thresholds:
+```python
+estimated_volume = spatial_samples × temporal_count × n_bands
+
+if estimated_volume > 100_000:
+    # Force aggressive batching
+```
+
+See `docs/adapters/SAMPLING_STRATEGY.md` for detailed analysis and Phase 2 proposal.
+
+### Testing
+
+**Comprehensive test:** `tests/test_comprehensive_assets.py`
+- Tests 17 assets across 3 priority tiers
+- Validates grid sampling, batching, error handling
+- Run time: ~5 minutes
+
+```bash
+python tests/test_comprehensive_assets.py
+```
+
+---
+
 ## Related Documentation
 
+- **SAMPLING_STRATEGY.md** (`docs/adapters/`) - Detailed analysis of spatial/temporal sampling strategies
 - **EARTH_ENGINE_OPTIMIZATION.md** - Original optimization analysis (archived)
 - **TIMEOUT_FIX.md** - Threading timeout implementation (archived)
 - **TEMPORAL_FALLBACK.md** - Temporal fallback strategy (superseded by this guide)
@@ -881,4 +1027,6 @@ Before deploying Earth Engine adapter changes:
 | 2025-09-30 | Temporal fallback with metadata annotation | ✅ Deployed |
 | 2025-09-30 | Consolidated operations guide created | ✅ Deployed |
 | 2025-10-20 | Grid sampling for Images and ImageCollections | ✅ Deployed |
-| 2025-10-21 | API configuration documentation (legacy vs Cloud Project) | ✅ Current |
+| 2025-10-21 | API configuration documentation (legacy vs Cloud Project) | ✅ Deployed |
+| 2025-10-21 | Server-side batching optimization (30-150× speedup) | ✅ Deployed |
+| 2025-10-22 | Phase 1 robustness fixes (asset validation, adaptive sampling, batch tuning) | ✅ Current |

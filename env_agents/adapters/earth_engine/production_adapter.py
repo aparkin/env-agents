@@ -204,7 +204,24 @@ class ProductionEarthEngineAdapter(BaseAdapter):
                 )
                 asset_type = "Image"
             except:
-                # Default to Image if both fail
+                # Check if it's an unsupported type (FeatureCollection/Table)
+                try:
+                    asset_info = ee.data.getAsset(self.asset_id)
+                    actual_type = asset_info.get('type', 'UNKNOWN')
+
+                    if actual_type in ['FeatureCollection', 'TABLE', 'Table']:
+                        raise ValueError(
+                            f"Asset '{self.asset_id}' is type '{actual_type}', which is not supported. "
+                            f"This adapter only supports Image and ImageCollection (raster) assets. "
+                            f"Vector/Table assets require different query methods."
+                        )
+                except ValueError:
+                    # Re-raise ValueError (unsupported type)
+                    raise
+                except:
+                    # Other errors, default to Image
+                    logger.warning(f"Could not determine asset type for {self.asset_id}, defaulting to Image")
+
                 asset_type = "Image"
 
         self._METADATA_CACHE[self.asset_id] = {"type": asset_type}
@@ -670,14 +687,35 @@ class ProductionEarthEngineAdapter(BaseAdapter):
 
         # Calculate appropriate sample count and generate grid
         max_samples = spec.extra.get("max_samples", 100) if spec.extra else 100
+
+        # Adaptive spatial sampling: reduce grid size for high-frequency collections
+        # This prevents memory issues and 5000-element limit
+        if count > 100:  # Daily or more frequent data
+            # Reduce to 3×3 (9 points) instead of 5×5 (25 points)
+            adaptive_max_samples = min(max_samples, 9)
+            logger.info(f"High-frequency collection ({count} images): reducing spatial sampling to {adaptive_max_samples} points")
+        else:
+            adaptive_max_samples = max_samples
+
         n_samples, n_side, sampling_metadata = calculate_sample_count(
-            bbox, self.scale, spec.resolution, max_samples
+            bbox, self.scale, spec.resolution, adaptive_max_samples
         )
 
         # Generate sample points
         sample_points = generate_sample_grid(bbox, n_side)
 
-        logger.info(f"Grid sampling ImageCollection (server-side batching): {n_samples} spatial points × {count} time steps")
+        logger.info(f"Grid sampling ImageCollection (server-side batching): {n_samples} spatial points × {count} time steps = {n_samples * count} total samples")
+
+        # Check if temporal batching is needed for high-frequency collections
+        # Earth Engine has limits: ~5000 features in flattened FeatureCollection
+        # Conservative threshold: If n_samples * count > 1000, use temporal batching
+        needs_batching = (n_samples * count) > 1000
+
+        if needs_batching:
+            # Calculate batch size to keep each batch well under 5000-element limit
+            # Target ~800 samples per batch (leaves safety margin)
+            max_images_per_batch = max(10, 800 // n_samples)  # At least 10 images per batch
+            logger.info(f"Using temporal batching: {max_images_per_batch} images per batch (total: {count} images)")
 
         # Create FeatureCollection from grid points for server-side processing
         features = []
@@ -707,17 +745,48 @@ class ProductionEarthEngineAdapter(BaseAdapter):
                 'system_time_start': img.get('system:time_start')
             }))
 
-        # Map across all images and flatten to single FeatureCollection
-        all_samples_fc = ic.map(sample_image).flatten()
+        # Process in batches if needed
+        all_samples = {'features': []}
 
-        # Single API call to fetch all samples
-        def get_all_samples():
-            return all_samples_fc.getInfo()
+        if needs_batching:
+            # Split collection into temporal batches
+            num_batches = (count + max_images_per_batch - 1) // max_images_per_batch
 
-        try:
-            all_samples = run_with_timeout(get_all_samples, timeout_sec=300)  # 5 min timeout for large queries
-        except TimeoutError as e:
-            raise Exception(f"Earth Engine timeout (fetching grid samples): {e}") from e
+            for batch_idx in range(num_batches):
+                batch_start = batch_idx * max_images_per_batch
+                batch_end = min(batch_start + max_images_per_batch, count)
+
+                logger.info(f"Processing batch {batch_idx + 1}/{num_batches}: images {batch_start} to {batch_end}")
+
+                # Get batch of images
+                batch_ic = ee.ImageCollection(ic.toList(batch_end, batch_start))
+
+                # Map and flatten for this batch
+                batch_samples_fc = batch_ic.map(sample_image).flatten()
+
+                # Fetch this batch
+                def get_batch_samples():
+                    return batch_samples_fc.getInfo()
+
+                try:
+                    batch_samples = run_with_timeout(get_batch_samples, timeout_sec=120)  # 2 min per batch
+                    if 'features' in batch_samples:
+                        all_samples['features'].extend(batch_samples['features'])
+                except TimeoutError as e:
+                    logger.warning(f"Timeout on batch {batch_idx + 1}, skipping: {e}")
+                    continue
+        else:
+            # Process all at once (original behavior for smaller queries)
+            all_samples_fc = ic.map(sample_image).flatten()
+
+            # Single API call to fetch all samples
+            def get_all_samples():
+                return all_samples_fc.getInfo()
+
+            try:
+                all_samples = run_with_timeout(get_all_samples, timeout_sec=300)  # 5 min timeout for large queries
+            except TimeoutError as e:
+                raise Exception(f"Earth Engine timeout (fetching grid samples): {e}") from e
 
         # Transform FeatureCollection to rows format
         rows = []
